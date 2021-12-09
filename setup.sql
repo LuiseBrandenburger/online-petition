@@ -15,5 +15,5 @@
 INSERT INTO signatures (first, last, signature) VALUES ('Luise', 'Brandenburger', 'String for Signature Picture Luise');
 INSERT INTO signatures (first, last, signature) VALUES ('Michael', 'Risberg', 'String for Signature Picture Michi');
 
--- SELECT * FROM signatures;
--- SELECT (first, last) FROM signatures;
+SELECT * FROM signatures;
+SELECT (first, last) FROM signatures;

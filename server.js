@@ -6,9 +6,7 @@ const { engine } = require("express-handlebars");
 
 /*
 TODO:
-:fenster::fenster:s-people: when you shut down your computer 
-and you restart postgres won’t be automatically starting up, 
- go into bash an restart it: sudo service postgresql start
+    dont forget to start psql service: sudo service postgresql start
 */
 
 /*************************** VIEW ENGINE ***************************/
@@ -50,7 +48,14 @@ app.get("/petition", (req, res) => {
         petition.handlebars
     */
 
-    // wenn ich den button submit clicke und es gibt den user schon in der db redirecte zu thanks
+    // TODO: als MIDDLEWARE einfügen???
+    // if (req.cookies.signature) {
+    //     console.log("there are cookies");
+    //     res.render("thanks", {});
+    // } else {
+    //     console.log("there are no cookies");
+    //     res.redirect("/petition");
+    // }
 
     res.render("petition", {});
     // console.log("im a GET Request on the petition page!!");
@@ -58,28 +63,44 @@ app.get("/petition", (req, res) => {
 });
 
 app.post("/petition", (req, res) => {
-    /* TODO:
+    /*
         * runs when the user submits their signature, i.e. 
-            clicks submit
+            clicks submit - check
         * attempts toINSERT all data to submit into a 
             designated table into your database, you will 
-            get this data from req.body
+            get this data from req.body - check TODO: (except for signature)
         * IF the db insert fails (i.e. your promise from 
             the db query gets rejected), rerender 
             petition.handlebars and pass an indication that 
             there should be an error message shown to the 
             template
         * IF there is no error
-            - set cookie to remember that the user has signed (do this last → this logic will change in the future)
+            - TODO: set cookie to remember that the user has signed (do this last → this logic will change in the future)
             - redirect to thank you page
     */
 
-    console.log("im a POST Request the petition page!!");
-    res.send("im a POST Request the petition page!!");
+    const data = req.body;
+    // console.log("here is the data", data);
+
+    addUser(data.first, data.last, "data.signature")
+        .then(() => {
+            // TODO: set signature cookies
+            res.cookie("first", data.first);
+            res.cookie("last", data.last);
+            res.cookie("signature", true);
+            res.redirect("/thanks");
+        })
+        .catch((err) => {
+            console.log("error adding user: ", err);
+            res.render("petition", {
+                // wenn error true ist, render eine error message
+                error: true,
+            });
+        });
 });
 
 app.get("/thanks", (req, res) => {
-    /* TODO:
+    /*
         * renders the thanks.handlebars template
         * However this should only be visible to those that have signed, so:
             - IF there is a cookie that the user has signed, 
@@ -88,9 +109,15 @@ app.get("/thanks", (req, res) => {
             (this means they haven't signed yet & should not see this page!)
     */
 
-    res.render("thanks", {});
-    // console.log("im a GET Request on the thanks page!!");
-    // res.send("im a GET Request on the thanks page!!");
+    // console.log("request cookies: ", req.cookies);
+
+    if (req.cookies.signature) {
+        console.log("there are cookies");
+        res.render("thanks", {});
+    } else {
+        console.log("there are no cookies");
+        res.redirect("/petition");
+    }
 });
 
 app.get("/signers", (req, res) => {
@@ -109,20 +136,22 @@ app.get("/signers", (req, res) => {
     // hole mir die Daten aus der Datenbank
 
     getUser()
-        .then(({rows}) => {
+        .then(({ rows }) => {
             // console.log("results.rows", rows);
 
-            numTotalUser().then(({rows})=>{
-                const count = rows[0].count;
-                console.log("data from COUNT: ", rows[0].count);
-                console.log(count);
-            }).catch((err)=>{
-                console.log(err);
-            });
+            numTotalUser()
+                .then(({ rows }) => {
+                    const count = rows[0].count;
+                    console.log("data from COUNT: ", rows[0].count);
+                    console.log(count);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
 
             res.render("signers", {
                 rows,
-                // totalCount: count,
+                // totalCount,
                 // count: count
             });
         })
@@ -133,6 +162,8 @@ app.get("/signers", (req, res) => {
     // console.log("im a GET Request on the signers page!!");
     // res.send("im a GET Request on the signers page!!");
 });
+
+// TODO: add a * route
 
 /*************************** ROUTES FOR TESTING ***************************/
 
