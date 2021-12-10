@@ -31,6 +31,7 @@ module.exports.addUser = (firstName, lastName, signature) => {
     // i want to run an insert statement
     const q = `INSERT INTO ${tableName} (first, last, signature)
                 VALUES ($1, $2, $3)`;
+                // RETURNING id
     // pg takes whatever is passed in and escapes any evil stuff
     // code david wrote for us :)
     // die order ist wichtig!!!

@@ -1,8 +1,10 @@
-const cookieParser = require("cookie-parser");
+// const cookieParser = require("cookie-parser");
 const express = require("express");
 const app = express();
 const { getUser, addUser, selectUser, numTotalUser } = require("./db");
 const { engine } = require("express-handlebars");
+const cookieSession = require("cookie-session");
+const secret = require("./secrets.json");
 
 /*
     FIXME:  dont forget to start psql service: sudo service postgresql start
@@ -17,13 +19,25 @@ app.set("view engine", "handlebars");
 
 // FIXME:   Check die Reihenfolge am Ende!
 
-app.use(cookieParser());
+// app.use(cookieParser());
+app.use(
+    // this middleware creates an object named session
+    cookieSession({
+        secret: secret.COOKIE_SECRET,
+        maxAge: 1000 * 60 * 60 * 24 * 14,
+    })
+);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(`${__dirname}/public`));
 
 /*************************** ROUTES ***************************/
 
 app.get("/", (req, res) => {
+    // we can add properties to the session now (we can add several sessions!)
+    // FIXME:   cookie.session
+    req.session.onion = "pizza";
+    console.log("session cookies: ", req.session.onion);
+
     res.render("welcome", {
         helpers: {
             ...app.locals.helpers,
@@ -39,11 +53,20 @@ app.get("/petition", (req, res) => {
         petition.handlebars
     */
 
-    if (req.cookies.signature) {
-        res.redirect("/thanks");
-    } else {
-        res.render("petition", {});
-    }
+    // if (req.cookies.signature) {
+    //     res.redirect("/thanks");
+    // } else {
+    //     res.render("petition", {});
+    // }
+
+    // FIXME:
+    // if (req.session.signature === true) {
+    //     res.redirect("/thanks");
+    // } else {
+    //     res.render("petition", {});
+    // }
+
+    res.render("petition", {});
 });
 
 app.post("/petition", (req, res) => {
@@ -68,10 +91,11 @@ app.post("/petition", (req, res) => {
 
     addUser(data.first, data.last, "data.signature")
         .then(() => {
-            // TODO: set signature cookies
-            res.cookie("first", data.first);
-            res.cookie("last", data.last);
-            res.cookie("signature", true);
+            // TODO: set signature cookies, add id?
+
+            req.session.first = data.first;
+            req.session.first = data.last;
+            req.session.signature = "string data signature";
             res.redirect("/thanks");
         })
         .catch((err) => {
@@ -93,11 +117,14 @@ app.get("/thanks", (req, res) => {
             (this means they haven't signed yet & should not see this page!)
     */
 
-    if (req.cookies.signature) {
-        res.render("thanks", {});
-    } else {
-        res.redirect("/petition");
-    };
+    // FIXME:   Cookie Session
+    // if (req.cookies.signature) {
+    //     res.render("thanks", {});
+    // } else {
+    //     res.redirect("/petition");
+    // }
+
+    res.render("thanks", {});
 });
 
 app.get("/signers", (req, res) => {
@@ -113,9 +140,10 @@ app.get("/signers", (req, res) => {
         COUNT can do for you here ;)
     */
 
-    if (!req.cookies.signature) {
-        res.redirect("/petition");
-    }
+    // FIXME: Cookie Session
+    // if (!req.cookies.signature) {
+    //     res.redirect("/petition");
+    // }
 
     getUser()
         .then(({ rows }) => {
@@ -146,7 +174,7 @@ app.get("/about", (req, res) => {
     res.render("about", {});
 });
 
-app.get("*", (req, res) =>{
+app.get("*", (req, res) => {
     res.redirect("/");
 });
 
@@ -178,7 +206,5 @@ app.post("/add-user", (req, res) => {
 /*************************** SERVER LISTENING ***************************/
 
 app.listen(8080, () => console.log("petition app listening..."));
-
-
 
 /*************************** FUNCTIONS ***************************/

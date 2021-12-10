@@ -8,15 +8,16 @@
     <label for="last">Last Name</label>
     <input type="text" id="last" name="last" />
     <label for="signature">Signature</label>
+    <input type="hidden" id="signature" name="signature" />
     <canvas
-        type="hidden"
-        id="signature"
+        id="signature-can"
         height="100"
         width="400"
-        name="signature"
     ></canvas>
+    <div id="try-again">try it again</div>
     <!-- <input type="hidden" id="signature"> -->
-    <button>Submit</button>
+    <button id="submit-btn">Submit</button>
 </form>
+
 
 <script src="petitionScript.js"></script>
