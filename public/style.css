@@ -5,3 +5,11 @@ body {
 canvas {
     background-color: #fff;
 }
+
+#input-err {
+    color: red;
+}
+
+img {
+    border: 2px solid grey;
+}

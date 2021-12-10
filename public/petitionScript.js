@@ -3,7 +3,6 @@ console.log("Hello Worlds");
 (function () {
     const signatureCan = document.getElementById("signature-can");
     const trySigAgain = document.getElementById("try-again");
-    const dataURL = signatureCan.toDataURL();
     const submitBtn = document.getElementById("submit-btn");
     const signatureInput = document.getElementById("signature");
 
@@ -13,16 +12,14 @@ console.log("Hello Worlds");
     let y = 0;
 
     // FIXME: Aufräumen!!! Arrow Functions etc.
-
     signatureCan.addEventListener("mousedown", function (event) {
-        console.log("EVENT X: ", event.offsetX);
-        console.log("EVENT Y: ", event.offsetY);
         x = event.offsetX;
         y = event.offsetY;
         isDrawing = true;
     });
 
     signatureCan.addEventListener("mousemove", function (event) {
+        console.log("Event offset X", event.offsetX);
         if (isDrawing === true) {
             drawSignature(context, x, y, event.offsetX, event.offsetY);
             x = event.offsetX;
@@ -39,13 +36,13 @@ console.log("Hello Worlds");
         isDrawing = false;
     });
 
-    trySigAgain.addEventListener("click", function (event) {
+    trySigAgain.addEventListener("click", function () {
         console.log("try it again");
         context.clearRect(0, 0, signatureCan.width, signatureCan.height);
     });
 
-    submitBtn.addEventListener("click", function (event) {
-        signatureInput.value = dataURL;
+    submitBtn.addEventListener("click", function () {
+        signatureInput.value = signatureCan.toDataURL();
         console.log("signature Input Value: ", signatureInput.value);
     });
 
