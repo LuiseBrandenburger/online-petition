@@ -20,8 +20,6 @@ console.log(`[db] connecting to: ${database}`);
     SELECT to get a total number of signers
  */
 
-
-
 // FIXME: ????
 module.exports.getUser = () => {
     const q = `SELECT * FROM ${tableName}`;
