@@ -27,9 +27,9 @@ module.exports.getUser = () => {
 
 // FIXME: Fix the ID Function!!
 module.exports.getUserByID = (id) => {
-    const q = `SELECT * FROM ${tableName} WHERE id ($1)`; //TODO: check again!! REMEBER pg
+    const q = `SELECT * FROM ${tableName} WHERE id = ($1)`; //TODO: check again!! REMEBER pg
     const params = [id];
-    return db.query(q);
+    return db.query(q, params);
 };
 
 module.exports.addUser = (firstName, lastName, signature) => {

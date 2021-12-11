@@ -49,7 +49,7 @@ console.log("Hello Worlds");
     function drawSignature(context, startX, startY, moveX, moveY) {
         context.beginPath();
         context.strokeStyle = "black";
-        context.lineWidth = 2;
+        context.lineWidth = 1;
         context.moveTo(startX, startY);
         context.lineTo(moveX, moveY);
         context.stroke();

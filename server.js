@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { getUser, addUser, numTotalUser } = require("./db");
+const { getUser, addUser, getUserByID, numTotalUser } = require("./db");
 const { engine } = require("express-handlebars");
 const cookieSession = require("cookie-session");
 const secret = require("./secrets.json");
@@ -50,7 +50,6 @@ app.get("/petition", (req, res) => {
 
 app.post("/petition", (req, res) => {
     const data = req.body;
-    // console.log("log data: ", data.first, data.last, data.signature)
 
     addUser(data.first, data.last, data.signature)
         .then(({ rows }) => {
@@ -58,7 +57,6 @@ app.post("/petition", (req, res) => {
             req.session.first = data.first;
             req.session.last = data.last;
             req.session.signatureId = rows[0].id;
-            // console.log("log Cookies Session: ", req.session);
             res.redirect("/thanks");
         })
         .catch((err) => {
@@ -71,61 +69,30 @@ app.post("/petition", (req, res) => {
 
 app.get("/thanks", (req, res) => {
     if (req.session.signatureId) {
-        // console.log("signature: ", req.session.signature);
-        // zweiter query um signatur where req.session signature id
-        // Promis.all
-
-        // FIXME: call getUserByID insted of getUser -> make code better!!!
-        Promise.all([getUser(), numTotalUser()])
-            .then((result) => {
         
-                let signatureURL = "";
-                // check in database for the user with the id
-                result[0].rows.forEach((item) => {
-                    if (item.id === req.session.signatureId) {
-                        // console.log("item in data array: ", item.signature);
-                        signatureURL = item.signature;
-                    }
-                });
-
-                console.log("signature URL from array: ", signatureURL);
+        Promise.all([getUserByID(req.session.signatureId), numTotalUser()])
+            .then((result) => {
                 res.render("thanks", {
                     count: result[1].rows[0].count,
-                    signatureURL
+                    signatureURL: result[0].rows[0].signature,
                 });
             })
             .catch((err) => {
                 console.log(err);
             });
 
-        // numTotalUser()
-        //     .then(({ rows }) => {
-        //         res.render("thanks", {
-        //             count: rows[0].count,
-        //             signatureURL: req.session.signature,
-        //         });
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     });
     } else {
         res.redirect("/petition");
     }
 });
 
 app.get("/signers", (req, res) => {
-    /* 
-        * SELECT first and last values of every person that 
-        has signed from the database and pass them to 
-        signers.handlebars
-      
-    */
-
+   
     if (!req.session.signatureId) {
         res.redirect("/petition");
     }
 
-    // Promis.all
+    // Promise.all
 
     getUser()
         .then(({ rows }) => {
