@@ -25,13 +25,13 @@ module.exports.getUserByID = (id) => {
     return db.query(q, params);
 };
 
-module.exports.addUser = (firstName, lastName, signature) => {
+module.exports.addUser = (signature, userID) => {
 
-    const q = `INSERT INTO ${tableName} (first, last, signature)
-                VALUES ($1, $2, $3)
+    const q = `INSERT INTO ${tableName} (signature, user_id)
+                VALUES ($1, $2)
                 RETURNING id`;
 
-    const params = [firstName, lastName, signature];
+    const params = [signature, userID];
     return db.query(q, params);
 };
 
@@ -45,9 +45,27 @@ module.exports.numTotalUser = () => {
     Queries
     TODO:   INSERT data into users table (in post /registration)
     TODO:   SELECT to get user info by email address (in post /login)
-    TODO:   INSERT for signatures table needs to be changed to include the user_id (in post /petition)
+    TODO:   INSERT for signatures table needs to be changed to FIXME: include the user_id (in post /petition)
     TODO:   SELECT from signatures to find out if a user has signed (post /login OR get /petition)
  
  */
+
+module.exports.signUpUser = (firstName, lastName, email, password ) => {
+    const q = `INSERT INTO ${tableNameUser} (first, last, email, password)
+                VALUES ($1, $2, $3, $4)
+                RETURNING id`;
+
+    const params = [firstName, lastName, email, password];
+    return db.query(q, params);
+};
+
+module.exports.getUserByEmail = (email) => {
+    // falls es nicht klappen sollte ($1) in single quotes stecken!
+    
+    const q = `SELECT * FROM ${tableNameUser} WHERE email = ($1)`;
+    const params = [email];
+    return db.query(q, params);
+};
+
 
 

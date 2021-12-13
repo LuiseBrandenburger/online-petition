@@ -46,7 +46,6 @@ INSERT INTO signatures (signature) VALUES ('String for Signature Picture Luise')
 INSERT INTO signatures (signature) VALUES ('String for Signature Picture Michi');
 
 
-
 SELECT * FROM signatures;
 SELECT * FROM users;
 -- SELECT (first, last) FROM signatures;

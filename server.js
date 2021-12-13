@@ -1,9 +1,17 @@
 const express = require("express");
 const app = express();
-const { getUser, addUser, getUserByID, numTotalUser } = require("./db");
+const {
+    getUser,
+    addUser,
+    getUserByID,
+    numTotalUser,
+    signUpUser,
+    getUserByEmail,
+} = require("./db");
 const { engine } = require("express-handlebars");
 const cookieSession = require("cookie-session");
 const secret = require("./secrets.json");
+const { compare, hash } = require("./bc");
 
 /*
     FIXME:  dont forget to start psql service: sudo service postgresql start
@@ -122,11 +130,9 @@ app.get("/logout", (req, res) => {
     res.render("logout", {});
 });
 
-
 /*************************** REGISTRATION & LOGIN ROUTES ***************************/
 
 // FIXME: *************************************************************** SIGNUP
-
 
 app.get("/signup", (req, res) => {
     res.render("signup", {});
@@ -146,24 +152,33 @@ app.post("/signup", (req, res) => {
     */
 
     const data = req.body;
+    // console.log("the data from POST signup is: ", data);
+    const pw = data.password;
+    // console.log("log the password: ", pw);
 
-    console.log(data);
+    hash(pw)
+        .then((hashedPw) => {
+            // console.log("hashedPWd :", hashedPw);
+            signUpUser(data.first, data.last, data.email, hashedPw)
+                .then((result) => {
+                    // set cookie to ID of the signature in db
+                    // req.session.first = data.first;
+                    // req.session.last = data.last;
+                    // req.session.signatureId = rows[0].id;
+                    console.log("signUpUsers rows: ", result);
+                    res.sendStatus(200);
+                    // res.redirect("/thanks");
+                })
+                .catch((err) => {
+                    console.log("error adding user: ", err);
+                    res.render("signup", {
+                        error: true,
+                    });
+                });
 
-    // addUser(data.first, data.last, data.signature)
-    //     .then(({ rows }) => {
-    //         // set cookie to ID of the signature in db
-    //         req.session.first = data.first;
-    //         req.session.last = data.last;
-    //         req.session.signatureId = rows[0].id;
-    //         res.redirect("/thanks");
-    //     })
-    //     .catch((err) => {
-    //         console.log("error adding user: ", err);
-    //         res.render("petition", {
-    //             error: true,
-    //         });
-    //     });
-    res.send("this worked!");
+            // res.sendStatus(200); // you will want to redirect your user to /petition
+        })
+        .catch((err) => console.log("err in hash", err));
 });
 
 // FIXME: *************************************************************** LOGIN
@@ -185,36 +200,41 @@ app.post("/login", (req, res) => {
                             TODO:   if not, redirect to /petition
             TODO:   if they don't match, COMPARE returns a boolean value of false & re-render with an error message 
     */
-
     const data = req.body;
+    // console.log("****************** the data from POST login is***************: ", data);
+    const pw = data.password;
+    const loginMail = data.email;
+    // console.log("log the mail: ", loginMail);
 
-    console.log(data);
+    getUserByEmail(data.email)
+        .then(({ rows }) => {
+            // console.log("ROWS PASSWORD::: ",rows[0].password);
 
-    // addUser(data.first, data.last, data.signature)
-    //     .then(({ rows }) => {
-    //         // set cookie to ID of the signature in db
-    //         req.session.first = data.first;
-    //         req.session.last = data.last;
-    //         req.session.signatureId = rows[0].id;
-    //         res.redirect("/thanks");
-    //     })
-    //     .catch((err) => {
-    //         console.log("error adding user: ", err);
-    //         res.render("petition", {
-    //             error: true,
-    //         });
-    //     });
-
-    res.send("this worked!");
+            compare(pw, rows[0].password)
+                .then((match) => {
+                    if (match) {
+                        res.redirect("/petition");
+                    } else {
+                        res.render("login", {
+                            error: true,
+                        });
+                    }
+                })
+                .catch((err) => console.log("err in compare:", err));
+        })
+        .catch((err) => {
+            console.log("error adding user: ", err);
+            res.render("login", {
+                error: true,
+            });
+        });
 });
-
 
 /*************************** SERVER LISTENING ***************************/
 
 app.get("*", (req, res) => {
     res.redirect("/");
 });
-
 
 app.listen(8080, () => console.log("petition app listening..."));
 
