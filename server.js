@@ -62,13 +62,6 @@ app.get("/petition", (req, res) => {
 });
 
 app.post("/petition", (req, res) => {
-    /*
-    FIXME:
-    TODO: alter your route so that you pass userId from the cookie to your query instead of first and last name
-            TODO:   update database function to no longer need these values
-            TODO:   instead of first and last make sure you enter the user's id into the database
-    */
-
     if (!req.session.signatureId) {
         const data = req.body;
         addUser(data.signature, req.session.userId)
@@ -111,7 +104,6 @@ app.get("/signers", (req, res) => {
 
     getUser()
         .then(({ rows }) => {
-            // console.log("rows: ", rows);
             res.render("signers", {
                 rows,
                 signed: true,
@@ -128,7 +120,6 @@ app.get("/about", (req, res) => {
 
 /*************************** REGISTRATION & LOGIN ROUTES ***************************/
 
-
 app.get("/signup", (req, res) => {
     if (req.session.userId) {
         res.redirect("/petition");
@@ -141,26 +132,34 @@ app.post("/signup", (req, res) => {
     const data = req.body;
     const pw = data.password;
 
-    hash(pw)
-        .then((hashedPw) => {
-            signUpUser(data.first, data.last, data.email, hashedPw)
-                .then(({ rows }) => {
-                    req.session.userId = rows[0].id;
-                    res.redirect("/petition");
-                })
-                .catch((err) => {
-                    console.log("error adding user: ", err);
-                    res.render("signup", {
-                        error: true,
-                    });
-                });
-        })
-        .catch((err) => {
-            console.log("err in hash", err);
-            res.render("signup", {
-                error: true,
-            });
+    // console.log("DATA INPUT FROM SIGNUP: ",data);
+    // maybe needs some fixing with Regular Expressions later
+    if (data.first == "" || data.last == "" || data.email == "" || pw == "") {
+        res.render("signup", {
+            error: true,
         });
+    } else {
+        hash(pw)
+            .then((hashedPw) => {
+                signUpUser(data.first, data.last, data.email, hashedPw)
+                    .then(({ rows }) => {
+                        req.session.userId = rows[0].id;
+                        res.redirect("/petition");
+                    })
+                    .catch((err) => {
+                        console.log("error adding user: ", err);
+                        res.render("signup", {
+                            error: true,
+                        });
+                    });
+            })
+            .catch((err) => {
+                console.log("err in hash", err);
+                res.render("signup", {
+                    error: true,
+                });
+            });
+    }
 });
 
 app.get("/login", (req, res) => {
@@ -185,14 +184,16 @@ app.post("/login", (req, res) => {
                             "session cookies after logged in: ",
                             req.session
                         );
-                        getSignatureById(req.session.userId).then(({rows}) => {
-                            if (rows[0].signature) {
-                                req.session.signatureId = rows[0].id;
-                                res.redirect("/thanks");
-                            } else {
-                                res.redirect("/petition");
+                        getSignatureById(req.session.userId).then(
+                            ({ rows }) => {
+                                if (rows[0].signature) {
+                                    req.session.signatureId = rows[0].id;
+                                    res.redirect("/thanks");
+                                } else {
+                                    res.redirect("/petition");
+                                }
                             }
-                        });
+                        );
                     } else {
                         res.render("login", {
                             error: true,
@@ -212,7 +213,6 @@ app.post("/login", (req, res) => {
                 error: true,
             });
         });
-
 });
 
 /*************************** LOGOUT AND REDIRECT* ***************************/
