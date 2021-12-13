@@ -7,6 +7,7 @@ const {
     numTotalUser,
     signUpUser,
     getUserByEmail,
+    getSignatureById,
 } = require("./db");
 const { engine } = require("express-handlebars");
 const cookieSession = require("cookie-session");
@@ -86,8 +87,6 @@ app.post("/petition", (req, res) => {
     }
 });
 
-
-
 app.get("/thanks", (req, res) => {
     if (req.session.signatureId) {
         Promise.all([getUserByID(req.session.signatureId), numTotalUser()])
@@ -129,11 +128,13 @@ app.get("/about", (req, res) => {
 
 /*************************** REGISTRATION & LOGIN ROUTES ***************************/
 
-// FIXME: *************************************************************** SIGNUP
 
 app.get("/signup", (req, res) => {
-    // if im already logged in, dont show this page!
-    res.render("signup", {});
+    if (req.session.userId) {
+        res.redirect("/petition");
+    } else {
+        res.render("signup", {});
+    }
 });
 
 app.post("/signup", (req, res) => {
@@ -163,8 +164,11 @@ app.post("/signup", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    // wenn user schon eingeloggt ist, render petition?
-    res.render("login", {});
+    if (req.session.userId) {
+        res.redirect("/petition");
+    } else {
+        res.render("login", {});
+    }
 });
 
 app.post("/login", (req, res) => {
@@ -181,13 +185,14 @@ app.post("/login", (req, res) => {
                             "session cookies after logged in: ",
                             req.session
                         );
-
-                        if (!req.session.signatureId) {
-                            console.log("no session cookies found");
-                            res.redirect("/petition");
-                        } else {
-                            res.redirect("/thanks");
-                        }
+                        getSignatureById(req.session.userId).then(({rows}) => {
+                            if (rows[0].signature) {
+                                req.session.signatureId = rows[0].id;
+                                res.redirect("/thanks");
+                            } else {
+                                res.redirect("/petition");
+                            }
+                        });
                     } else {
                         res.render("login", {
                             error: true,
@@ -208,13 +213,12 @@ app.post("/login", (req, res) => {
             });
         });
 
-        // redirect if im already logged in!
 });
 
 /*************************** LOGOUT AND REDIRECT* ***************************/
 
 app.get("/logout", (req, res) => {
-    req.session.userId = null;
+    req.session = null;
     res.render("logout", {});
 });
 
