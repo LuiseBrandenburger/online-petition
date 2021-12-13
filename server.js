@@ -49,40 +49,44 @@ app.get("/", (req, res) => {
 });
 
 app.get("/petition", (req, res) => {
-    if (req.session.signatureId) {
-        res.redirect("/thanks");
+    if (req.session.userId) {
+        if (req.session.signatureId) {
+            res.redirect("/thanks");
+        } else {
+            res.render("petition", {});
+        }
     } else {
-        res.render("petition", {});
+        res.send("please log in to sign the petition");
     }
 });
 
 app.post("/petition", (req, res) => {
     /*
-
+    FIXME:
     TODO: alter your route so that you pass userId from the cookie to your query instead of first and last name
-            TODO:   first and last are not required anymore
             TODO:   update database function to no longer need these values
             TODO:   instead of first and last make sure you enter the user's id into the database
-    
     */
 
-    const data = req.body;
-
-    addUser(data.first, data.last, data.signature)
-        .then(({ rows }) => {
-            // set cookie to ID of the signature in db
-            req.session.first = data.first;
-            req.session.last = data.last;
-            req.session.signatureId = rows[0].id;
-            res.redirect("/thanks");
-        })
-        .catch((err) => {
-            console.log("error adding user: ", err);
-            res.render("petition", {
-                error: true,
+    if (!req.session.signatureId) {
+        const data = req.body;
+        addUser(data.signature, req.session.userId)
+            .then(({ rows }) => {
+                req.session.signatureId = rows[0].id;
+                res.redirect("/thanks");
+            })
+            .catch((err) => {
+                console.log("error adding user: ", err);
+                res.render("petition", {
+                    error: true,
+                });
             });
-        });
+    } else {
+        res.redirect("/thanks");
+    }
 });
+
+
 
 app.get("/thanks", (req, res) => {
     if (req.session.signatureId) {
@@ -106,8 +110,6 @@ app.get("/signers", (req, res) => {
         res.redirect("/petition");
     }
 
-    // Promise.all
-
     getUser()
         .then(({ rows }) => {
             // console.log("rows: ", rows);
@@ -125,49 +127,25 @@ app.get("/about", (req, res) => {
     res.render("about", {});
 });
 
-app.get("/logout", (req, res) => {
-    req.session = null;
-    res.render("logout", {});
-});
-
 /*************************** REGISTRATION & LOGIN ROUTES ***************************/
 
 // FIXME: *************************************************************** SIGNUP
 
 app.get("/signup", (req, res) => {
+    // if im already logged in, dont show this page!
     res.render("signup", {});
 });
 
 app.post("/signup", (req, res) => {
-    /*
-    
-    POST /register
-    TODO:   grab the user input and read it on the server
-    TODO:   hash the password that the user typed and THEN
-    TODO:   insert a row in the USERS table (new table) 
-            -> see 3. for table structure
-    TODO:   if the insert is successful, add userId in a cookie 
-            (value should be the id created by postgres when the row was inserted).
-    TODO:   if insert fails, re-render template with an error message
-    */
-
     const data = req.body;
-    // console.log("the data from POST signup is: ", data);
     const pw = data.password;
-    // console.log("log the password: ", pw);
 
     hash(pw)
         .then((hashedPw) => {
-            // console.log("hashedPWd :", hashedPw);
             signUpUser(data.first, data.last, data.email, hashedPw)
-                .then((result) => {
-                    // set cookie to ID of the signature in db
-                    // req.session.first = data.first;
-                    // req.session.last = data.last;
-                    // req.session.signatureId = rows[0].id;
-                    console.log("signUpUsers rows: ", result);
-                    res.sendStatus(200);
-                    // res.redirect("/thanks");
+                .then(({ rows }) => {
+                    req.session.userId = rows[0].id;
+                    res.redirect("/petition");
                 })
                 .catch((err) => {
                     console.log("error adding user: ", err);
@@ -175,66 +153,76 @@ app.post("/signup", (req, res) => {
                         error: true,
                     });
                 });
-
-            // res.sendStatus(200); // you will want to redirect your user to /petition
         })
-        .catch((err) => console.log("err in hash", err));
+        .catch((err) => {
+            console.log("err in hash", err);
+            res.render("signup", {
+                error: true,
+            });
+        });
 });
 
-// FIXME: *************************************************************** LOGIN
-
 app.get("/login", (req, res) => {
+    // wenn user schon eingeloggt ist, render petition?
     res.render("login", {});
 });
 
 app.post("/login", (req, res) => {
-    /*
-    POST /login
-
-    TODO:   get the user's stored hashed password from the db using the user's email address
-    TODO:   pass the hashed password to COMPARE along with the password the user typed in the input field
-            TODO:   if they match, COMPARE returns a boolean value of true
-                    TODO:   store the userId in a cookie
-                    TODO:   do a db query to find out if they've signed
-                            TODO:   if yes, you want to put their sigId in a cookie & redirect to /thanks
-                            TODO:   if not, redirect to /petition
-            TODO:   if they don't match, COMPARE returns a boolean value of false & re-render with an error message 
-    */
     const data = req.body;
-    // console.log("****************** the data from POST login is***************: ", data);
     const pw = data.password;
-    const loginMail = data.email;
-    // console.log("log the mail: ", loginMail);
 
     getUserByEmail(data.email)
         .then(({ rows }) => {
-            // console.log("ROWS PASSWORD::: ",rows[0].password);
-
             compare(pw, rows[0].password)
                 .then((match) => {
                     if (match) {
-                        res.redirect("/petition");
+                        req.session.userId = rows[0].id;
+                        console.log(
+                            "session cookies after logged in: ",
+                            req.session
+                        );
+
+                        if (!req.session.signatureId) {
+                            console.log("no session cookies found");
+                            res.redirect("/petition");
+                        } else {
+                            res.redirect("/thanks");
+                        }
                     } else {
                         res.render("login", {
                             error: true,
                         });
                     }
                 })
-                .catch((err) => console.log("err in compare:", err));
+                .catch((err) => {
+                    console.log("password error", err);
+                    res.render("login", {
+                        error: true,
+                    });
+                });
         })
         .catch((err) => {
-            console.log("error adding user: ", err);
+            console.log("error finding user: ", err);
             res.render("login", {
                 error: true,
             });
         });
+
+        // redirect if im already logged in!
 });
 
-/*************************** SERVER LISTENING ***************************/
+/*************************** LOGOUT AND REDIRECT* ***************************/
+
+app.get("/logout", (req, res) => {
+    req.session.userId = null;
+    res.render("logout", {});
+});
 
 app.get("*", (req, res) => {
     res.redirect("/");
 });
+
+/*************************** SERVER LISTENING ***************************/
 
 app.listen(8080, () => console.log("petition app listening..."));
 

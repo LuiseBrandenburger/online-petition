@@ -60,8 +60,6 @@ module.exports.signUpUser = (firstName, lastName, email, password ) => {
 };
 
 module.exports.getUserByEmail = (email) => {
-    // falls es nicht klappen sollte ($1) in single quotes stecken!
-    
     const q = `SELECT * FROM ${tableNameUser} WHERE email = ($1)`;
     const params = [email];
     return db.query(q, params);

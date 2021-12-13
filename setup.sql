@@ -21,9 +21,6 @@ CREATE TABLE users(
 
 CREATE TABLE signatures (
     id SERIAL PRIMARY KEY,
-    -- first VARCHAR NOT NULL CHECK (first != ''),
-    -- last VARCHAR NOT NULL CHECK (last != ''),
-    -- signature VARCHAR NOT NULL CHECK (signature != ''),
     signature TEXT NOT NULL,
     user_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -41,9 +38,6 @@ CREATE TABLE signatures (
 
 INSERT INTO users (first, last, email, password) VALUES ('Michael', 'Risberg', 'michi@abc.com', 'nyc123');
 INSERT INTO users (first, last, email, password) VALUES ('Luise', 'Brandenburger', 'luise@abc.com', 'berlin123');
-
-INSERT INTO signatures (signature) VALUES ('String for Signature Picture Luise');
-INSERT INTO signatures (signature) VALUES ('String for Signature Picture Michi');
 
 
 SELECT * FROM signatures;
