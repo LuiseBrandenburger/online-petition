@@ -8,6 +8,7 @@ const {
     signUpUser,
     getUserByEmail,
     getSignatureById,
+    getSignatures,
 } = require("./db");
 const { engine } = require("express-handlebars");
 const cookieSession = require("cookie-session");
@@ -57,7 +58,10 @@ app.get("/petition", (req, res) => {
             res.render("petition", {});
         }
     } else {
-        res.send("please log in to sign the petition");
+        // res.send("please log in to sign the petition");
+        res.render("welcome", {
+            error: true,
+        });
     }
 });
 
@@ -98,27 +102,66 @@ app.get("/thanks", (req, res) => {
 });
 
 app.get("/signers", (req, res) => {
-    if (!req.session.signatureId) {
-        res.redirect("/petition");
+    if (!req.session.userId) {
+        res.redirect("/login");
+    } else {
+        if (!req.session.signatureId) {
+            res.redirect("/petition");
+        } else {
+            getUser()
+                .then(({ rows }) => {
+                    // FIXME: signature ID checken wer hat unterschrieben und wer nicht.
+                    // console.log("rows users: ", rows);
+                    // rows.forEach((element) => {});
+
+                    res.render("signers", {
+                        rows,
+                        signed: true,
+                    });
+                })
+                .catch((err) => {
+                    console.log("error in getSignatures: ", err);
+                });
+        }
     }
-
-    getUser()
-        .then(({ rows }) => {
-            res.render("signers", {
-                rows,
-                signed: true,
-            });
-        })
-        .catch((err) => {
-            console.log("error in getUser: ", err);
-        });
 });
 
-app.get("/about", (req, res) => {
-    res.render("about", {});
+app.get("/signers/:city", (req, res) => {
+    /*
+    GET /signers/:city - Calls a new query to get signers for the 
+    city specified in the url (req.params.city). It is fine to 
+    pass these rows to the exact same template as the other signers page.
+     */
+
+    console.log("reg params City: ", req.params.city);
+    // pass in the req.params.city into a query and show the list of signatures in Berlin
+
+    res.sendStatus(200);
+
+    // if (!req.session.userId) {
+    //     res.redirect("/login");
+    // } else {
+    //     if (!req.session.signatureId) {
+    //         res.redirect("/petition");
+    //     } else {
+        // FIXME: 
+    //     //     getSignaturesByCity(req.params.city)
+    //     //         // .then(({ rows }) => {
+    //     //         //     // console.log("rows users: ", rows);
+    //     //         //     // rows.forEach((element) => {});
+    //     //         //     res.render("signers", {
+    //     //         //         rows,
+    //     //         //         signed: true,
+    //     //         //     });
+    //     //         // })
+    //     //         // .catch((err) => {
+    //     //         //     console.log("error in getSignatures: ", err);
+    //     //         // });
+    //     // }
+    // }
 });
 
-/*************************** REGISTRATION & LOGIN ROUTES ***************************/
+/*************************** REGISTRATION ROUTE ***************************/
 
 app.get("/signup", (req, res) => {
     if (req.session.userId) {
@@ -144,7 +187,7 @@ app.post("/signup", (req, res) => {
                 signUpUser(data.first, data.last, data.email, hashedPw)
                     .then(({ rows }) => {
                         req.session.userId = rows[0].id;
-                        res.redirect("/petition");
+                        res.redirect("/profile");
                     })
                     .catch((err) => {
                         console.log("error adding user: ", err);
@@ -161,6 +204,50 @@ app.post("/signup", (req, res) => {
             });
     }
 });
+
+/*************************** PROFILE ROUTE ***************************/
+
+app.get("/profile", (req, res) => {
+    // FIXME: you can only see this if you signed up
+    if (req.session.userId) {
+        res.render("profile", {});
+    } else {
+        // res.redirect("login", {});
+        res.sendStatus(404);
+    }
+});
+
+app.post("/profile", (req, res) => {
+    const data = req.body;
+
+    console.log("DATA INPUT FROM PROFILE: ", data);
+    // maybe needs some fixing with Regular Expressions later
+    if (data.age == "" || data.city == "" || data.homepage == "") {
+        res.render("profile", {
+            error: true,
+        });
+    } else if (data) {
+        // check if data.homepage input is http: etc.
+        console.log("data Homepage", data.homepage);
+        res.sendStatus(200);
+    } else {
+        // TODO: push data into DB
+        // signUpUser(data.age, data.city, data.homepage)
+        //     .then(({ rows }) => {
+        //         req.session.userId = rows[0].id;
+        //         res.redirect("/profile");
+        //     })
+        //     .catch((err) => {
+        //         console.log("error adding user: ", err);
+        //         res.render("signup", {
+        //             error: true,
+        //         });
+        //     });
+        res.sendStatus(200);
+    }
+});
+
+/*************************** LOGIN ROUTE ***************************/
 
 app.get("/login", (req, res) => {
     if (req.session.userId) {
@@ -180,10 +267,10 @@ app.post("/login", (req, res) => {
                 .then((match) => {
                     if (match) {
                         req.session.userId = rows[0].id;
-                        console.log(
-                            "session cookies after logged in: ",
-                            req.session
-                        );
+                        // console.log(
+                        //     "session cookies after logged in: ",
+                        //     req.session
+                        // );
                         getSignatureById(req.session.userId).then(
                             ({ rows }) => {
                                 if (rows[0].signature) {
@@ -215,7 +302,11 @@ app.post("/login", (req, res) => {
         });
 });
 
-/*************************** LOGOUT AND REDIRECT* ***************************/
+/*************************** LOGOUT / REDIRECT* AND OTHER ROUTES ***************************/
+
+app.get("/about", (req, res) => {
+    res.render("about", {});
+});
 
 app.get("/logout", (req, res) => {
     req.session = null;

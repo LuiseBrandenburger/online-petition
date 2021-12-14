@@ -26,6 +26,11 @@ module.exports.getUser = () => {
     return db.query(q);
 };
 
+module.exports.getSignatures = () => {
+    const q = `SELECT * FROM ${tableName}`;
+    return db.query(q);
+};
+
 module.exports.getUserByID = (id) => {
     const q = `SELECT * FROM ${tableName} WHERE id = ($1)`; 
     const params = [id];

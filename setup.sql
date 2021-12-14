@@ -1,5 +1,6 @@
 
  DROP TABLE IF EXISTS signatures;
+ DROP TABLE IF EXISTS profiles;
  DROP TABLE IF EXISTS users;
  
 -- ****************************** USERS ********************************
@@ -33,6 +34,19 @@ CREATE TABLE signatures (
 -- and your create table commands should have the order of first create the table the 
 -- provides the reference value (users), then the table that stores this 
 -- value as a foreign key
+
+-- ****************************** PROFILES ********************************
+
+-- FIXME: user_id nochmal überdenken!
+
+CREATE TABLE profiles (
+    id SERIAL PRIMARY KEY,
+    age INTEGER NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NOT NULL,
+    user_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
 
 -- ****************************** INSERTS ********************************
 
