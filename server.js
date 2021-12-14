@@ -8,7 +8,9 @@ const {
     signUpUser,
     getUserByEmail,
     getSignatureById,
+    signUpUserProfile,
     getSignatures,
+    getSignaturesByCity,
 } = require("./db");
 const { engine } = require("express-handlebars");
 const cookieSession = require("cookie-session");
@@ -26,9 +28,6 @@ app.set("view engine", "handlebars");
 
 /*************************** MIDDLEWARE ***************************/
 
-// FIXME:   Check die Reihenfolge am Ende!
-
-// prevent Clickjacking
 app.use((req, res, next) => {
     res.setHeader("x-frame-options", "deny");
     next();
@@ -58,7 +57,6 @@ app.get("/petition", (req, res) => {
             res.render("petition", {});
         }
     } else {
-        // res.send("please log in to sign the petition");
         res.render("welcome", {
             error: true,
         });
@@ -108,15 +106,12 @@ app.get("/signers", (req, res) => {
         if (!req.session.signatureId) {
             res.redirect("/petition");
         } else {
-            getUser()
+            getSignatures()
                 .then(({ rows }) => {
-                    // FIXME: signature ID checken wer hat unterschrieben und wer nicht.
-                    // console.log("rows users: ", rows);
-                    // rows.forEach((element) => {});
-
+                    console.log("rows of signatures: ", rows);
                     res.render("signers", {
                         rows,
-                        signed: true,
+                        // signed: true,
                     });
                 })
                 .catch((err) => {
@@ -127,38 +122,27 @@ app.get("/signers", (req, res) => {
 });
 
 app.get("/signers/:city", (req, res) => {
-    /*
-    GET /signers/:city - Calls a new query to get signers for the 
-    city specified in the url (req.params.city). It is fine to 
-    pass these rows to the exact same template as the other signers page.
-     */
-
-    console.log("reg params City: ", req.params.city);
-    // pass in the req.params.city into a query and show the list of signatures in Berlin
-
-    res.sendStatus(200);
-
-    // if (!req.session.userId) {
-    //     res.redirect("/login");
-    // } else {
-    //     if (!req.session.signatureId) {
-    //         res.redirect("/petition");
-    //     } else {
-        // FIXME: 
-    //     //     getSignaturesByCity(req.params.city)
-    //     //         // .then(({ rows }) => {
-    //     //         //     // console.log("rows users: ", rows);
-    //     //         //     // rows.forEach((element) => {});
-    //     //         //     res.render("signers", {
-    //     //         //         rows,
-    //     //         //         signed: true,
-    //     //         //     });
-    //     //         // })
-    //     //         // .catch((err) => {
-    //     //         //     console.log("error in getSignatures: ", err);
-    //     //         // });
-    //     // }
-    // }
+    if (!req.session.userId) {
+        res.redirect("/login");
+    } else {
+        if (!req.session.signatureId) {
+            res.redirect("/petition");
+        } else {
+            getSignaturesByCity(req.params.city)
+                .then(({ rows }) => {
+                    console.log("rows users: ", rows);
+                    // FIXME: how can i render it correctly?
+                    res.render("signers", {
+                        rows,
+                        // city: false,
+                        // signed: true,
+                    });
+                })
+                .catch((err) => {
+                    console.log("error in getSignatures: ", err);
+                });
+        }
+    }
 });
 
 /*************************** REGISTRATION ROUTE ***************************/
@@ -175,8 +159,6 @@ app.post("/signup", (req, res) => {
     const data = req.body;
     const pw = data.password;
 
-    // console.log("DATA INPUT FROM SIGNUP: ",data);
-    // maybe needs some fixing with Regular Expressions later
     if (data.first == "" || data.last == "" || data.email == "" || pw == "") {
         res.render("signup", {
             error: true,
@@ -208,42 +190,56 @@ app.post("/signup", (req, res) => {
 /*************************** PROFILE ROUTE ***************************/
 
 app.get("/profile", (req, res) => {
-    // FIXME: you can only see this if you signed up
     if (req.session.userId) {
-        res.render("profile", {});
+        if (req.session.signatureId) {
+            res.redirect("/thanks");
+        } else {
+            res.render("profile", {});
+        }
     } else {
-        // res.redirect("login", {});
-        res.sendStatus(404);
+        res.render("404", {});
     }
 });
 
 app.post("/profile", (req, res) => {
     const data = req.body;
 
-    console.log("DATA INPUT FROM PROFILE: ", data);
-    // maybe needs some fixing with Regular Expressions later
-    if (data.age == "" || data.city == "" || data.homepage == "") {
+    if (
+        data.age.length !== 0 ||
+        data.city.length !== 0 ||
+        data.homepage.length !== 0
+    ) {
+        if (
+            data.homepage.startsWith("http:") ||
+            data.homepage.startsWith("https:") ||
+            data.homepage.startsWith("//")
+        ) {
+            signUpUserProfile(
+                data.age,
+                data.city,
+                data.homepage,
+                req.session.userId
+            )
+                .then(({ rows }) => {
+                    req.session.userId = rows[0].id;
+                    req.session.profileId = rows[0].id;
+                    console.log(
+                        "Session Cookies after setting up user profile: ",
+                        req.session
+                    );
+                    res.redirect("/petition");
+                })
+                .catch((err) => {
+                    console.log("error adding profile: ", err);
+                    res.render("profile", {
+                        error: true,
+                    });
+                });
+        }
+    } else {
         res.render("profile", {
             error: true,
         });
-    } else if (data) {
-        // check if data.homepage input is http: etc.
-        console.log("data Homepage", data.homepage);
-        res.sendStatus(200);
-    } else {
-        // TODO: push data into DB
-        // signUpUser(data.age, data.city, data.homepage)
-        //     .then(({ rows }) => {
-        //         req.session.userId = rows[0].id;
-        //         res.redirect("/profile");
-        //     })
-        //     .catch((err) => {
-        //         console.log("error adding user: ", err);
-        //         res.render("signup", {
-        //             error: true,
-        //         });
-        //     });
-        res.sendStatus(200);
     }
 });
 
@@ -251,7 +247,11 @@ app.post("/profile", (req, res) => {
 
 app.get("/login", (req, res) => {
     if (req.session.userId) {
-        res.redirect("/petition");
+        if (!req.session.signatureId) {
+            res.redirect("/petition");
+        } else {
+            res.redirect("/thanks");
+        }
     } else {
         res.render("login", {});
     }
@@ -267,10 +267,6 @@ app.post("/login", (req, res) => {
                 .then((match) => {
                     if (match) {
                         req.session.userId = rows[0].id;
-                        // console.log(
-                        //     "session cookies after logged in: ",
-                        //     req.session
-                        // );
                         getSignatureById(req.session.userId).then(
                             ({ rows }) => {
                                 if (rows[0].signature) {

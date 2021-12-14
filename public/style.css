@@ -24,6 +24,10 @@ canvas {
     text-align: center;
 }
 
+#signature-img {
+    width: 400px;
+}
+
 img {
     border: 1px solid grey;
 }

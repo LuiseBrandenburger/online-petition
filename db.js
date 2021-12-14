@@ -3,15 +3,13 @@ const spicedPg = require("spiced-pg");
 const database = "petition";
 const username = "postgres";
 const password = "postgres";
-const tableName = "signatures";
-const tableNameUser = "users";
+
 const db = spicedPg(
     `postgres:${username}:${password}@localhost:5432/${database}`
 );
 
 // console.log("db", db);
 // console.log(`[db] connecting to: ${database}`);
-
 
 /*
     Queries
@@ -22,24 +20,23 @@ const db = spicedPg(
  */
 
 module.exports.getUser = () => {
-    const q = `SELECT * FROM ${tableNameUser}`;
+    const q = `SELECT * FROM users`;
     return db.query(q);
 };
 
-module.exports.getSignatures = () => {
-    const q = `SELECT * FROM ${tableName}`;
-    return db.query(q);
-};
+
+
+
 
 module.exports.getUserByID = (id) => {
-    const q = `SELECT * FROM ${tableName} WHERE id = ($1)`; 
+    const q = `SELECT * FROM signatures WHERE id = ($1)`; 
     const params = [id];
     return db.query(q, params);
 };
 
 module.exports.addUser = (signature, userID) => {
 
-    const q = `INSERT INTO ${tableName} (signature, user_id)
+    const q = `INSERT INTO signatures (signature, user_id)
                 VALUES ($1, $2)
                 RETURNING id`;
 
@@ -48,12 +45,12 @@ module.exports.addUser = (signature, userID) => {
 };
 
 module.exports.numTotalUser = () => {
-    const q = `SELECT COUNT(*) FROM ${tableNameUser}`;
+    const q = `SELECT COUNT(*) FROM users`;
     return db.query(q);
 };
 
 module.exports.signUpUser = (firstName, lastName, email, password ) => {
-    const q = `INSERT INTO ${tableNameUser} (first, last, email, password)
+    const q = `INSERT INTO users (first, last, email, password)
     VALUES ($1, $2, $3, $4)
     RETURNING id`;
     
@@ -62,14 +59,63 @@ module.exports.signUpUser = (firstName, lastName, email, password ) => {
 };
 
 module.exports.getUserByEmail = (email) => {
-    const q = `SELECT * FROM ${tableNameUser} WHERE email = ($1)`;
+    const q = `SELECT * FROM users WHERE email = ($1)`;
     const params = [email];
     return db.query(q, params);
 };
 
 module.exports.getSignatureById = (id) => {
-    const q = `SELECT * FROM ${tableName} WHERE user_id = ($1)`;
+    const q = `SELECT * FROM signatures WHERE user_id = ($1)`;
     const params = [id];
     return db.query(q, params);
 };
 
+module.exports.signUpUserProfile = (age, city, url, userID) => {
+    const q = `INSERT INTO profiles (age, city, url, user_id)
+    VALUES ($1, $2, $3, $4)
+    RETURNING id`;
+
+    const params = [age, city, url, userID];
+    return db.query(q, params);
+};
+
+
+/*
+TODO:
+Modify the query to get the signers so that it joins the signatures table with 
+the users table AND the new user profiles table. We want data from the users table 
+(first and last name) and the user_profiles table (age, city, and url). 
+We want to use the signatures table to limit the results to only users who have signed.
+
+TODO: 
+A new query that is exactly like the one to get the signers but has in addition a 
+WHERE clause that limits to a certain city. You can make the query case insensitive 
+by using the SQL LOWER function (e.g., WHERE LOWER(city) = LOWER($1)).
+
+TODO: 
+Change the query to get user information by email address so that it joins the 
+signatures table and gets the signature id for the user if the user has signed
+ */
+
+
+module.exports.getSignatures = () => {
+    const q = `SELECT signatures.signature, signatures.user_id AS signature_user_id, users.first, users.last, profiles.age, profiles.city, profiles.url, profiles.user_id AS profiles_user_id
+    FROM users
+        JOIN signatures
+        ON users.id = signatures.user_id
+        JOIN profiles
+        ON users.id = profiles.user_id`;
+    return db.query(q);
+};
+
+module.exports.getSignaturesByCity = (city) => {
+    const q = `SELECT signatures.signature, signatures.user_id AS signature_user_id, users.first, users.last, profiles.age, profiles.city, profiles.url, profiles.user_id AS profiles_user_id
+    FROM users
+        JOIN signatures
+        ON users.id = signatures.user_id
+        JOIN profiles
+        ON users.id = profiles.user_id
+        WHERE LOWER(profiles.city) = LOWER($1)`;
+    const params = [city];
+    return db.query(q, params);
+};
