@@ -60,7 +60,13 @@ app.use(express.static(`${__dirname}/public`));
 /*************************** ROUTES ***************************/
 
 app.get("/", (req, res) => {
-    res.render("welcome", {});
+    if (req.session.userId) {
+        res.render("welcome", {
+            loggedIn: true,
+        });
+    } else {
+        res.render("welcome", {});
+    }
 });
 
 /*************************** REGISTRATION ROUTE ***************************/

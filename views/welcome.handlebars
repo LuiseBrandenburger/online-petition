@@ -1,4 +1,10 @@
-{{> navbar login=true signup=true}}
+{{!-- TODO: Update Handlebar: wenn User Logged in ist --}}
+
+{{#if loggedIn}}
+{{> navbar logout=true petition=true}}
+{{else}}
+{{> navbar login=true}}
+{{/if}}
 
 {{#if error}}<div id="input-err">Please log in to sign the petition</div>{{/if}}
 
