@@ -1,3 +1,5 @@
+{{> navbar petition=true}}
+
 {{#if error}}<div id="input-err">something went wrong with the registration, please try again</div>{{/if}}
 
 <form action="" method="POST">
@@ -5,7 +7,7 @@
 <input type="number" id="profile-age" name="age">
 <label for="profile-city">City</label>
 <input type="text" id="profile-city" name="city">
-<label for="profile-homepage">Homepage</label>
-<input type="text" id="profile-homepage" name="homepage">
+<label for="profile-url">Homepage</label>
+<input type="text" id="profile-url" name="url">
 <button id="signup-btn">continue</button>
 </form>

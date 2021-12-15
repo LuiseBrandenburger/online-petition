@@ -13,6 +13,8 @@ const {
     getSignaturesByCity,
     getProfileUserByID,
     getProfileById,
+    updateUserAndPW,
+    deleteSignature,
 } = require("./db");
 const { engine } = require("express-handlebars");
 const cookieSession = require("cookie-session");
@@ -59,56 +61,6 @@ app.use(express.static(`${__dirname}/public`));
 
 app.get("/", (req, res) => {
     res.render("welcome", {});
-});
-
-app.get("/petition", (req, res) => {
-    if (req.session.userId) {
-        if (req.session.signatureId) {
-            res.redirect("/thanks");
-        } else {
-            res.render("petition", {});
-        }
-    } else {
-        res.render("welcome", {
-            error: true,
-        });
-    }
-});
-
-app.post("/petition", (req, res) => {
-    if (!req.session.signatureId) {
-        const data = req.body;
-        addUser(data.signature, req.session.userId)
-            .then(({ rows }) => {
-                req.session.signatureId = rows[0].id;
-                res.redirect("/thanks");
-            })
-            .catch((err) => {
-                console.log("error adding user: ", err);
-                res.render("petition", {
-                    error: true,
-                });
-            });
-    } else {
-        res.redirect("/thanks");
-    }
-});
-
-app.get("/thanks", (req, res) => {
-    if (req.session.signatureId) {
-        Promise.all([getUserByID(req.session.signatureId), numTotalUser()])
-            .then((result) => {
-                res.render("thanks", {
-                    count: result[1].rows[0].count,
-                    signatureURL: result[0].rows[0].signature,
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    } else {
-        res.redirect("/petition");
-    }
 });
 
 /*************************** REGISTRATION ROUTE ***************************/
@@ -170,23 +122,15 @@ app.get("/profile", (req, res) => {
 app.post("/profile", (req, res) => {
     const data = req.body;
 
-    if (
-        data.age.length !== 0 ||
-        data.city.length !== 0 ||
-        data.homepage.length !== 0
-    ) {
+    if (data.url.length !== 0) {
         if (
-            data.homepage.startsWith("http:") ||
-            data.homepage.startsWith("https:") ||
-            data.homepage.startsWith("//")
+            data.url.startsWith("http:") ||
+            data.url.startsWith("https:") ||
+            data.url.startsWith("//")
         ) {
-            signUpUserProfile(
-                data.age,
-                data.city,
-                data.homepage,
-                req.session.userId
-            )
+            signUpUserProfile(data.age, data.city, data.url, req.session.userId)
                 .then(({ rows }) => {
+                    console.log("rows in sigUpUserProfile: ", rows);
                     req.session.userId = rows[0].id;
                     req.session.profileId = rows[0].id;
                     console.log(
@@ -203,9 +147,138 @@ app.post("/profile", (req, res) => {
                 });
         }
     } else {
-        res.render("profile", {
+        res.redirect("/petition");
+    }
+});
+
+/*************************** PROFILE EDIT HERE ***************************/
+
+app.get("/profile/edit", (req, res) => {
+    // console.log(req.session);
+
+    if (!req.session.userId) {
+        res.redirect("/login");
+    } else {
+        getProfileUserByID(req.session.userId).then(({ rows }) => {
+            // FIXME: FIXME:  WHY DOES THIS NOT WORK????? FIXME: FIXME:
+
+            console.log("ROWS for profile edit: ", rows);
+
+            res.render("edit", {
+                first: rows[0].first,
+                last: rows[0].last,
+                email: rows[0].email,
+                age: rows[0].age,
+                city: rows[0].city,
+                url: rows[0].url,
+            });
+        });
+    }
+
+    res.render("edit", {});
+});
+
+app.post("/profile/edit", (req, res) => {
+    const data = req.body;
+    const pw = data.password;
+
+    console.log(req.body.password);
+    if (!req.body.password) {
+        getProfileById(req.session.userId).then(({ rows }) => {
+            console.log("get profiles by id: ", rows);
+            res.sendStatus(200);
+        });
+
+        // TODO: We need to first of all check if they have a row
+        // TODO: If they don't, create one
+        // TODO: If they do, update it
+        // TODO: UPDATE users table: first, last, email
+        // TODO: UPDATE user_profiles table: age, city, url (if row in table exists)
+    } else {
+        res.send("password was updated");
+
+        // user has updated their password
+        // update users table and profiles table with a new password
+
+        // hash(pw)
+        //     .then((hashedPw) => {
+
+        //         // TODO: use promis all
+        //         updateUserAndPW(
+        //             data.first,
+        //             data.last,
+        //             data.email,
+        //             hashedPw,
+        //             req.session.userId
+        //         )
+        //             .then(() => {
+        //                 // TODO: UPSERT USER PROFILES
+        //             })
+        //             .catch((err) => {
+        //                 console.log("error aupdating new Profile data: ", err);
+        //                 res.render("edit", {
+        //                     error: true,
+        //                 });
+        //             });
+        //     })
+        //     .catch((err) => {
+        //         console.log("err in hash", err);
+        //         res.render("edit", {
+        //             error: true,
+        //         });
+        //     });
+    }
+});
+
+/*************************** SIGN PETITION ***************************/
+
+app.get("/petition", (req, res) => {
+    if (req.session.userId) {
+        if (req.session.signatureId) {
+            res.redirect("/thanks");
+        } else {
+            res.render("petition", {});
+        }
+    } else {
+        res.render("welcome", {
             error: true,
         });
+    }
+});
+
+app.post("/petition", (req, res) => {
+    if (!req.session.signatureId) {
+        const data = req.body;
+        addUser(data.signature, req.session.userId)
+            .then(({ rows }) => {
+                req.session.signatureId = rows[0].id;
+                res.redirect("/thanks");
+            })
+            .catch((err) => {
+                console.log("error adding user: ", err);
+                res.render("petition", {
+                    error: true,
+                });
+            });
+    } else {
+        res.redirect("/thanks");
+    }
+});
+
+app.get("/thanks", (req, res) => {
+    if (req.session.signatureId) {
+        Promise.all([getUserByID(req.session.signatureId), numTotalUser()])
+            .then((result) => {
+                res.render("thanks", {
+                    count: result[1].rows[0].count,
+                    signatureURL: result[0].rows[0].signature,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    } else {
+        res.redirect("/petition");
     }
 });
 
@@ -312,78 +385,20 @@ app.get("/signers/:city", (req, res) => {
     }
 });
 
-/*************************** EDIT ROUTES ***************************/
-
-app.get("/profile/edit", (req, res) => {
-    if (!req.session.userId) {
-        res.redirect("/login");
-    } else {
-        getProfileUserByID(req.session.userId).then(({ rows }) => {
-            res.render("edit", {
-                first: rows[0].first,
-                last: rows[0].last,
-                email: rows[0].email,
-                age: rows[0].age,
-                city: rows[0].city,
-                url: rows[0].url,
-            });
-        });
-    }
-});
-
-app.post("/profile/edit", (req, res) => {
-    console.log(req.body.password);
-    if (!req.body.password) {
-        // user has left their password as it is
-        // update users table and profiles table without a new password
-        /*
-        First Block (user has NOT updated their password)
-
-        We need to update TWO tables
-        TODO: UPDATE users table: first, last, email
-        TODO: UPDATE user_profiles table: age, city, url (if row in table exists)
-        We need 2 separate queries for this as there is no UPDATE JOIN
-
-        ALSO: we need to consider that the user might have skipped the profile page without filling it in.
-
-        In this case, they won't have a row to update in this table and this will cause an error
-        SOLUTION: 
-        TODO: We need to first of all check if they have a row
-        TODO: If they don't, create one
-        TODO: If they do, update it
-        This is called an UPSERT and it looks like this
-         */
-
-        // TODO:    1. check if user has a row in profile table
-
-        // get profile by id
-        getProfileById().then(({ rows }) => {
-            console.log("get profiles by id: ", rows);
-            res.sendStatus(200);
-        });
-
-        // Promise.all([getUserByID(req.session.signatureId), numTotalUser()])
-        //     .then((result) => {
-        //         res.render("thanks", {
-        //             count: result[1].rows[0].count,
-        //             signatureURL: result[0].rows[0].signature,
-        //         });
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     });
-    } else {
-        getProfileById().then(({ rows }) => {
-            console.log("get profiles by id: ", rows);
-            res.sendStatus(200);
-        });
-
-        // user has updated their password
-        // update users table and profiles table with a new password
-    }
-});
-
 /*************************** LOGOUT / REDIRECT* AND OTHER ROUTES ***************************/
+
+app.post("/thanks/delete", (req, res) => {
+    console.log(req.session);
+    deleteSignature(req.session.userId)
+        .then(() => {
+            req.session.signatureId = null;
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log(err);
+            res.sendStatus(200);
+        });
+});
 
 app.get("/about", (req, res) => {
     res.render("about", {});
@@ -403,5 +418,3 @@ app.get("*", (req, res) => {
 app.listen(process.env.PORT || 8080, () =>
     console.log("petition app listening...")
 );
-
-/*************************** FUNCTIONS ***************************/

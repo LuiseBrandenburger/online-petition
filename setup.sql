@@ -19,7 +19,6 @@ CREATE TABLE signatures (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 
-
 CREATE TABLE profiles (
     id SERIAL PRIMARY KEY,
     age INTEGER,
@@ -29,27 +28,6 @@ CREATE TABLE profiles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 
--- ****************************** USERS ********************************
--- ****************************** SIGNATURES ********************************
-
--- here we are adding the foreign key (user_id)
--- foreign key lets us identify which user from the users table signed the petition
--- and which signature is theirs (acts as an identifier btw the 2 tables!)
-
--- the order in which you drop your tables in your sql file matters now that we have 
--- introduced a foreign key, make sure that you first drop the table the contains the 
--- foreign key (signatures), then the table that is the source for the foreign key (users), 
--- and your create table commands should have the order of first create the table the 
--- provides the reference value (users), then the table that stores this 
--- value as a foreign key
-
--- ****************************** PROFILES ********************************
--- ****************************** INSERTS ********************************
-
--- INSERT INTO users (first, last, email, password) VALUES ('Michael', 'Risberg', 'michi@abc.com', 'nyc123');
--- INSERT INTO users (first, last, email, password) VALUES ('Luise', 'Brandenburger', 'luise@abc.com', 'berlin123');
-
 SELECT * FROM signatures;
 SELECT * FROM users;
 SELECT * FROM profiles;
--- SELECT (first, last) FROM signatures;

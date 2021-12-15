@@ -39,6 +39,8 @@
         context.clearRect(0, 0, signatureCan.width, signatureCan.height);
     });
 
+    // FIXME: das signature Feld darf nicht leer sein!
+
     submitBtn.addEventListener("click", () => {
         signatureInput.value = signatureCan.toDataURL();
         // console.log("signature Input Value: ", signatureInput.value);

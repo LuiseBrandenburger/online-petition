@@ -3,13 +3,12 @@
     
     <nav>
         <ul>
-            <li><a href="/petition">SIGN PETITION</a></li>
-            <li><a href="/signers">WHO SIGNED</a></li>
-            <li><a href="/about">ABOUT</a></li>
+            {{#if petition}}<li><a href="/petition">SIGN PETITION</a></li>{{/if}}
+            {{#if signers}}<li><a href="/signers">WHO SIGNED</a></li>{{/if}}
             <li><a href="/">HOME</a></li>
-            <li><a href="/logout">LOGOUT</a></li>
-            <li><a href="/login">LOGIN</a></li>
-            <li><a href="/signup">SIGN UP</a></li>
-            <li><a href="/profile/edit">EDIT</a></li>
+            {{#if signup}}<li><a href="/signup">SIGN UP</a></li>{{/if}}
+            {{#if edit}}<li><a href="/profile/edit">EDIT PROFILE</a></li>{{/if}}
+            {{#if logout}}<li><a href="/logout">LOGOUT</a></li>{{/if}}
+            {{#if login}}<li><a href="/login">LOGIN</a></li>{{/if}}
         </ul>
     </nav>
