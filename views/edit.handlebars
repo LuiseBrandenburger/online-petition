@@ -1,0 +1,19 @@
+{{#if error}}<div id="input-err">something went wrong with edit, please try again</div>{{/if}}
+
+<form action="" method="POST">
+<label for="signup-first">First Name</label>
+<input type="text" id="signup-first" name="first" value="{{first}}">
+<label for="signup-last">Last Name</label>
+<input type="text" id="signup-last" name="last" value="{{last}}">
+<label for="signup-email">E-Mail</label>
+<input type="email" id="signup-email" name="email" value="{{email}}">
+<label for="signup-pw">Password</label>
+<input type="password" id="signup-pw" name="password">
+<label for="profile-age">Age</label>
+<input type="number" id="profile-age" name="age" value="{{age}}">
+<label for="profile-city">City</label>
+<input type="text" id="profile-city" name="city" value="{{city}}">
+<label for="profile-homepage">Homepage</label>
+<input type="text" id="profile-homepage" name="homepage" value="{{url}}">
+<button id="signup-btn">UPDATE PROFILE</button>
+</form>
