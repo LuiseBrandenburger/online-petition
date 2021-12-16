@@ -1,22 +1,11 @@
 {{> navbar logout=true edit=true signers=true home=true}}
 
-{{!-- {{#if signed}} <img src="" alt="">{{/if}} --}}
-
 <ul>
     {{#rows}}
         <li>{{#if url}}
             <a href="{{url}}" target="_blank">{{first}} {{last}}</a>
-            {{else}}
-            {{first}} {{last}}
-            {{/if}}
-            {{#if age}}- Age: {{age}} {{/if}}
+            {{else}}{{first}} {{last}}{{/if}}{{#if age}}- Age: {{age}} {{/if}}
             {{#if city}}<a href="/signers/{{toLowerCase city}}">- {{city}}</a>{{/if}}</li>
     {{/rows}}
 </ul>
 
-{{!-- <p>Totoal Count <span>{{count}}</span></p> --}}
-
-{{! signers.handlebars - for each signer, show the age and 
-city (if they exist) and if the url exists, link up the name 
-(make sure the url does not run Javascript code). Cities, 
-when shown, should link to a new url }}

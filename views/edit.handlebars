@@ -10,7 +10,7 @@
 <label for="edit-last">Last Name</label>
 <input type="text" id="edit-last" name="last" value="{{last}}">
 <label for="edit-email">E-Mail</label>
-<input type="email" id="edit-email" name="email" value="{{email}}">
+<input type="email" id="edit-email" name="email" readonly="readonly" value="{{email}}">
 <label for="edit-pw">Password</label>
 <input type="password" id="edit-pw" name="password">
 <label for="edit-age">Age</label>
@@ -20,4 +20,9 @@
 <label for="edit-url">Homepage</label>
 <input type="text" id="edit-url" name="url" value="{{url}}">
 <button id="edit-btn">UPDATE PROFILE</button>
+</form>
+
+
+<form action="/thanks/delete" method="POST">
+    <button id="delete-signature">Delete Signature</button>
 </form>

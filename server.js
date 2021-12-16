@@ -245,7 +245,6 @@ app.get("/profile/edit", (req, res) => {
     if (!req.session.userId) {
         res.redirect("/login");
     } else {
-        // if profile is not filled
         getProfileById(req.session.userId).then(({ rows }) => {
             if (rows.length > 0) {
                 getProfileUserByID(req.session.userId)
@@ -295,6 +294,7 @@ app.get("/profile/edit", (req, res) => {
     }
 });
 
+// FIXME:
 app.post("/profile/edit", (req, res) => {
     const data = req.body;
     const password = data.password;
@@ -302,6 +302,9 @@ app.post("/profile/edit", (req, res) => {
     if (!req.body.password) {
         getProfileById(req.session.userId).then(({ rows }) => {
             if (rows.length > 0) {
+                if (rows[0].age === 0) {
+                    rows[0].age = "";
+                }
                 Promise.all([
                     updateUser(
                         data.first,
@@ -324,15 +327,44 @@ app.post("/profile/edit", (req, res) => {
                             if (results[1].rows[0].age === 0) {
                                 results[1].rows[0].age = "";
                             }
-                            res.render("edit", {
-                                first: results[0].rows[0].first,
-                                last: results[0].rows[0].last,
-                                email: results[0].rows[0].email,
-                                age: results[1].rows[0].age,
-                                city: results[1].rows[0].city,
-                                url: results[1].rows[0].url,
-                                updated: true,
-                            });
+                            if (results[1].rows[0].city.length === 0) {
+                                results[1].rows[0].city = "";
+                            }
+                            if (results[1].rows[0].url.length !== 0) {
+                                if (
+                                    !results[1].rows[0].url.startsWith(
+                                        "http:"
+                                    ) ||
+                                    !results[1].rows[0].url.startsWith(
+                                        "https:"
+                                    ) ||
+                                    !results[1].rows[0].url.startsWith("//")
+                                ) {
+
+                                    // FIXME:
+                                    // console.log("The RESULTS ARE: ", results);
+                                    // res.render("edit", {
+                                    //     first: results[0].rows[0].first,
+                                    //     last: results[0].rows[0].last,
+                                    //     email: results[0].rows[0].email,
+                                    //     age: results[1].rows[0].age,
+                                    //     city: results[1].rows[0].city,
+                                    //     url: "",
+                                    //     error: true,
+                                    // });
+                                    res.redirect("/profile/edit");
+                                }
+                            } else {
+                                res.render("edit", {
+                                    first: results[0].rows[0].first,
+                                    last: results[0].rows[0].last,
+                                    email: results[0].rows[0].email,
+                                    age: results[1].rows[0].age,
+                                    city: results[1].rows[0].city,
+                                    url: results[1].rows[0].url,
+                                    updated: true,
+                                });
+                            }
                         });
                     })
                     .catch((err) => {
