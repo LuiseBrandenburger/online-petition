@@ -237,39 +237,25 @@ app.get("/profile/edit", (req, res) => {
     if (!req.session.userId) {
         res.redirect("/login");
     } else {
-        getUserFromUsersByID(req.session.userId)
+        
+        getProfileUserByID(req.session.userId)
             .then(({ rows }) => {
-                console.log(rows);
+
+                // console.log("ROWS for profile edit: ", rows);
                 res.render("edit", {
                     first: rows[0].first,
                     last: rows[0].last,
                     email: rows[0].email,
+                    age: rows[0].age,
+                    city: rows[0].city,
+                    url: rows[0].url,
                 });
             })
             .catch((err) => {
-                console.log(err);
+                console.log("something went wrong with the query:", err);
             });
-
-
-        // getProfileUserByID(req.session.userId).then(({ rows }) => {
-        //     // FIXME: FIXME:  WHY DOES THIS NOT WORK????? FIXME: FIXME:
-
-        //     console.log("ROWS for profile edit: ", rows);
-
-        //     res.render("edit", {
-        //         first: rows[0].first,
-        //         last: rows[0].last,
-        //         email: rows[0].email,
-        //         age: rows[0].age,
-        //         city: rows[0].city,
-        //         url: rows[0].url
-        //     }).catch((err)=>{
-        //         console.log("something went wrong with the query:", err);
-        //     });
-        // });
     }
 });
-
 
 // FIXME:
 
@@ -428,7 +414,6 @@ app.get("/signers/:city", (req, res) => {
 /*************************** LOGOUT / REDIRECT* AND OTHER ROUTES ***************************/
 
 app.post("/thanks/delete", (req, res) => {
-
     deleteSignature(req.session.userId)
         .then(() => {
             req.session.signatureId = null;

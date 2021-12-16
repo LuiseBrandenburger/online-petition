@@ -100,10 +100,9 @@ module.exports.getSignaturesByCity = (city) => {
 // FIXME: something is wrong here, I cant finde the issue!
 
 module.exports.getProfileUserByID = (id) => {
-    const q = `SELECT user.id, users.first, users.last, users.email, users.password, profiles.age, profiles.city, profiles.url, profiles.user_id 
+    const q = `SELECT users.id, users.first, users.last, users.email, users.password, profiles.age, profiles.city, profiles.url, profiles.user_id 
     FROM users 
-    JOIN profiles
-    ON users.id = profiles.user_id
+    JOIN profiles ON users.id = profiles.user_id
     WHERE users.id = ($1)`;
     const params = [id];
     return db.query(q, params);
