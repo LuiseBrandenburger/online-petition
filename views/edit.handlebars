@@ -4,25 +4,25 @@
 {{#if error}}<div id="input-err">something went wrong with edit, please try again</div>{{/if}}
 {{#if updated}}<div id="input-err">Form was successfully updated</div>{{/if}}
 
-<form action="" method="POST">
+<form action="" method="POST" id="edit-form">
 <label for="edit-first">First Name</label>
-<input type="text" id="edit-first" name="first" value="{{first}}">
+<input type="text" id="edit-first" name="first" placeholder="ENTER FIRST NAME" value="{{first}}">
 <label for="edit-last">Last Name</label>
-<input type="text" id="edit-last" name="last" value="{{last}}">
+<input type="text" id="edit-last" name="last" placeholder="ENTER LAST NAME" value="{{last}}">
 <label for="edit-email">E-Mail</label>
-<input type="email" id="edit-email" name="email" readonly="readonly" value="{{email}}">
+<input type="email" id="edit-email" name="email" placeholder="ENTER EMAIL" readonly="readonly" value="{{email}}">
 <label for="edit-pw">Password</label>
 <input type="password" id="edit-pw" name="password">
 <label for="edit-age">Age</label>
-<input type="number" id="edit-age" name="age" value="{{age}}">
+<input type="number" id="edit-age" name="age" placeholder="ENTER YOUR AGE" value="{{age}}">
 <label for="edit-city">City</label>
-<input type="text" id="edit-city" name="city" value="{{city}}">
+<input type="text" id="edit-city" name="city" placeholder="ENTER HOME CITY" value="{{city}}">
 <label for="edit-url">Homepage</label>
-<input type="text" id="edit-url" name="url" value="{{url}}">
+<input type="text" id="edit-url" name="url" placeholder="URL STARTING WITH HTTPS: HTTP: or //" value="{{url}}">
 <button id="edit-btn">UPDATE PROFILE</button>
 </form>
 
 
 <form action="/thanks/delete" method="POST">
-    <button id="delete-signature">Delete Signature</button>
+    <button id="delete-signature">DELETE SIGNATURE</button>
 </form>

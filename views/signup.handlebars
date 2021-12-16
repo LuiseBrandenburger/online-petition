@@ -1,8 +1,10 @@
 {{> navbar home=true}}
 
+{{!-- <div id="signup-container"> --}}
+
 {{#if error}}<div id="input-err">something went wrong with the registration, please try again</div>{{/if}}
 
-<form action="" method="POST">
+<form action="" method="POST" id="signup-form">
 <label for="signup-first">First Name</label>
 <input type="text" id="signup-first" name="first">
 <label for="signup-last">Last Name</label>
@@ -14,5 +16,8 @@
 <button id="signup-btn">sign up</button>
 </form>
 
+<div id="login-here">
 <p>If you are already a member, please <a href="/login">login here</a></p>
+</div>
 
+{{!-- </div> --}}
