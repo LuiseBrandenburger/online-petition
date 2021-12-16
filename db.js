@@ -9,9 +9,6 @@ const db = spicedPg(
     `postgres:${username}:${password}@localhost:5432/${database}`
 );
 
-// console.log("db", db);
-// console.log(`[db] connecting to: ${database}`);
-
 /*
     Queries
     TODO:   INSERT data into users table (in post /registration)
@@ -97,8 +94,6 @@ module.exports.getSignaturesByCity = (city) => {
     return db.query(q, params);
 };
 
-// FIXME: something is wrong here, I cant finde the issue!
-
 module.exports.getProfileUserByID = (id) => {
     const q = `SELECT users.id, users.first, users.last, users.email, users.password, profiles.age, profiles.city, profiles.url, profiles.user_id 
     FROM users 
@@ -114,16 +109,12 @@ module.exports.getUserFromUsersByID = (id) => {
     return db.query(q, params);
 };
 
-
-// get profile by id
-
 module.exports.getProfileById = (id) => {
     const q = `SELECT * FROM profiles WHERE user_id = ($1)`;
     const params = [id];
     return db.query(q, params);
 };
 
-// update users
 module.exports.updateUser = (firstName, lastName, email, id) => {
     const q = `UPDATE users SET first = ($1), last = ($2), email = ($3)
     WHERE id = ($4)`;
@@ -131,7 +122,6 @@ module.exports.updateUser = (firstName, lastName, email, id) => {
     return db.query(q, params);
 };
 
-// Update Users And Password
 module.exports.updateUserAndPW = (firstName, lastName, email, password, id) => {
     const q = `UPDATE users SET first = ($1), last = ($2), email = ($3), password = ($4)
     WHERE id = ($5)`;
@@ -142,8 +132,6 @@ module.exports.updateUserAndPW = (firstName, lastName, email, password, id) => {
 
 // TODO: UPSERT!
 
-
-// DELETE
 
 module.exports.deleteSignature = (id) => {
     const q = `DELETE FROM signatures WHERE user_id = ($1)`;

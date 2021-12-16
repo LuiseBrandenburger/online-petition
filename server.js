@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const {
-    getUser,
     addUser,
     getUserByID,
     numTotalUser,
@@ -14,7 +13,6 @@ const {
     getProfileUserByID,
     getProfileById,
     updateUserAndPW,
-    getUserFromUsersByID,
     deleteSignature,
 } = require("./db");
 const { engine } = require("express-handlebars");
@@ -132,6 +130,7 @@ app.get("/profile", (req, res) => {
 
 app.post("/profile", (req, res) => {
     const data = req.body;
+    console.log("log data.age: ", data.age);
 
     if (data.url.length !== 0) {
         if (
@@ -139,10 +138,11 @@ app.post("/profile", (req, res) => {
             data.url.startsWith("https:") ||
             data.url.startsWith("//")
         ) {
+            if (data.age.length === 0) {
+                data.age = 0;
+            }
             signUpUserProfile(data.age, data.city, data.url, req.session.userId)
-                .then(({ rows }) => {
-                    // req.session.userId = rows[0].id;
-                    // req.session.profileId = rows[0].id;
+                .then(() => {
                     res.redirect("/petition");
                 })
                 .catch((err) => {
@@ -157,10 +157,11 @@ app.post("/profile", (req, res) => {
             });
         }
     } else if (data.url.length === 0) {
+        if (data.age.length === 0) {
+            data.age = 0;
+        }
         signUpUserProfile(data.age, data.city, data.url, req.session.userId)
-            .then(({ rows }) => {
-                // req.session.userId = rows[0].id;
-                // req.session.profileId = rows[0].id;
+            .then(() => {
                 res.redirect("/petition");
             })
             .catch((err) => {
@@ -232,16 +233,14 @@ app.post("/login", (req, res) => {
 /*************************** PROFILE EDIT HERE ***************************/
 
 app.get("/profile/edit", (req, res) => {
-    // console.log(req.session);
-
     if (!req.session.userId) {
         res.redirect("/login");
     } else {
-        
         getProfileUserByID(req.session.userId)
             .then(({ rows }) => {
-
-                // console.log("ROWS for profile edit: ", rows);
+                if (rows[0].age === 0) {
+                    rows[0].age = "";
+                }
                 res.render("edit", {
                     first: rows[0].first,
                     last: rows[0].last,
@@ -263,51 +262,79 @@ app.post("/profile/edit", (req, res) => {
     const data = req.body;
     const pw = data.password;
 
-    console.log(req.body.password);
     if (!req.body.password) {
         getProfileById(req.session.userId).then(({ rows }) => {
             console.log("get profiles by id: ", rows);
-            res.sendStatus(200);
+            console.log("log row length: ", rows.length);
+            // if (rows[0].length > 0) {
+            //     // else nimm die existing row
+            //     // update this row
+            //     console.log("this row needs to be updated!");
+            //     res.sendStatus(200);
+            // } else {
+            //     // if row is empty create one
+            //     // create new row insert Profile
+            //     console.log("this row needs to be created!");
+            //     signUpUserProfile(
+            //         data.age,
+            //         data.city,
+            //         data.url,
+            //         req.session.userId
+            //     )
+            //         .then(({ rows }) => {
+            //             console.log(
+            //                 `rows in profile of user ${req.session.userId} when password wasnt changed `,
+            //                 rows
+            //             );
+            //         })
+            //         .catch((err) => {
+            //             console.log("error editing profile: ", err);
+            //             res.render("edit", {
+            //                 error: true,
+            //             });
+            //         });
+            // }
         });
 
         // TODO: We need to first of all check if they have a row
         // TODO: If they don't, create one
         // TODO: If they do, update it
+
         // TODO: UPDATE users table: first, last, email
         // TODO: UPDATE user_profiles table: age, city, url (if row in table exists)
     } else {
         res.send("password was updated");
+        res.sendStatus(200);
 
         // user has updated their password
         // update users table and profiles table with a new password
 
-        // hash(pw)
-        //     .then((hashedPw) => {
-
-        //         // TODO: use promis all
-        //         updateUserAndPW(
-        //             data.first,
-        //             data.last,
-        //             data.email,
-        //             hashedPw,
-        //             req.session.userId
-        //         )
-        //             .then(() => {
-        //                 // TODO: UPSERT USER PROFILES
-        //             })
-        //             .catch((err) => {
-        //                 console.log("error aupdating new Profile data: ", err);
-        //                 res.render("edit", {
-        //                     error: true,
-        //                 });
-        //             });
-        //     })
-        //     .catch((err) => {
-        //         console.log("err in hash", err);
-        //         res.render("edit", {
-        //             error: true,
-        //         });
-        //     });
+        hash(pw)
+            .then((hashedPw) => {
+                // TODO: use promis all
+                updateUserAndPW(
+                    data.first,
+                    data.last,
+                    data.email,
+                    hashedPw,
+                    req.session.userId
+                )
+                    .then(() => {
+                        // TODO: UPSERT USER PROFILES
+                    })
+                    .catch((err) => {
+                        console.log("error aupdating new Profile data: ", err);
+                        res.render("edit", {
+                            error: true,
+                        });
+                    });
+            })
+            .catch((err) => {
+                console.log("err in hash", err);
+                res.render("edit", {
+                    error: true,
+                });
+            });
     }
 });
 
@@ -397,7 +424,6 @@ app.get("/signers/:city", (req, res) => {
             getSignaturesByCity(req.params.city)
                 .then(({ rows }) => {
                     console.log("rows users: ", rows);
-                    // FIXME: how can i render it correctly?
                     res.render("signers", {
                         rows,
                         // city: false,
