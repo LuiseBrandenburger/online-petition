@@ -14,6 +14,8 @@ const {
     getProfileById,
     updateUserAndPW,
     deleteSignature,
+    getUserFromUsersByID,
+    upsertUserProfile,
 } = require("./db");
 const { engine } = require("express-handlebars");
 const cookieSession = require("cookie-session");
@@ -260,7 +262,7 @@ app.get("/profile/edit", (req, res) => {
 
 app.post("/profile/edit", (req, res) => {
     const data = req.body;
-    const pw = data.password;
+    const password = data.password;
 
     if (!req.body.password) {
         getProfileById(req.session.userId).then(({ rows }) => {
@@ -295,32 +297,46 @@ app.post("/profile/edit", (req, res) => {
             //         });
             // }
         });
-
-        // TODO: We need to first of all check if they have a row
-        // TODO: If they don't, create one
-        // TODO: If they do, update it
-
-        // TODO: UPDATE users table: first, last, email
-        // TODO: UPDATE user_profiles table: age, city, url (if row in table exists)
     } else {
-        res.send("password was updated");
-        res.sendStatus(200);
-
-        // user has updated their password
-        // update users table and profiles table with a new password
-
-        hash(pw)
+        hash(password)
             .then((hashedPw) => {
-                // TODO: use promis all
-                updateUserAndPW(
-                    data.first,
-                    data.last,
-                    data.email,
-                    hashedPw,
-                    req.session.userId
-                )
+                if (data.age.length === 0) {
+                    data.age = 0;
+                }
+                Promise.all([
+                    updateUserAndPW(
+                        data.first,
+                        data.last,
+                        data.email,
+                        hashedPw,
+                        req.session.userId
+                    ),
+                    upsertUserProfile(
+                        data.age,
+                        data.city,
+                        data.url,
+                        req.session.userId
+                    ),
+                ])
                     .then(() => {
-                        // TODO: UPSERT USER PROFILES
+                        // GET THE INFOS BACK
+                        Promise.all([
+                            getUserFromUsersByID(req.session.userId),
+                            getProfileById(req.session.userId),
+                        ]).then((results) => {
+                            if (results[1].rows[0].age === 0) {
+                                results[1].rows[0].age = "";
+                            }
+                            res.render("edit", {
+                                first: results[0].rows[0].first,
+                                last: results[0].rows[0].last,
+                                email: results[0].rows[0].email,
+                                age: results[1].rows[0].age,
+                                city: results[1].rows[0].city,
+                                url: results[1].rows[0].url,
+                                updated: true,
+                            });
+                        });
                     })
                     .catch((err) => {
                         console.log("error aupdating new Profile data: ", err);
@@ -462,6 +478,10 @@ app.get("*", (req, res) => {
 
 /*************************** SERVER LISTENING ***************************/
 
-app.listen(process.env.PORT || 8080, () =>
-    console.log("petition app listening...")
-);
+if (require.main == module) {
+    app.listen(process.env.PORT || 8080, () =>
+        console.log("petition app listening...")
+    );
+}
+
+module.exports.app = app;

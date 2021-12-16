@@ -125,12 +125,20 @@ module.exports.updateUser = (firstName, lastName, email, id) => {
 module.exports.updateUserAndPW = (firstName, lastName, email, password, id) => {
     const q = `UPDATE users SET first = ($1), last = ($2), email = ($3), password = ($4)
     WHERE id = ($5)`;
-
     const params = [firstName, lastName, email, password, id];
     return db.query(q, params);
 };
 
 // TODO: UPSERT!
+
+module.exports.upsertUserProfile = (age, city, url, id) => {
+    const q = `INSERT INTO profiles (age, city, url, user_id)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (user_id)
+                DO UPDATE SET age = ($1), city = ($2), url = ($3), user_id = ($4)`;
+    const params = [age, city, url, id];
+    return db.query(q, params);
+};
 
 
 module.exports.deleteSignature = (id) => {
