@@ -5,12 +5,12 @@
 <ul>
     {{#rows}}
         <li>{{#if url}}
-            <a href="{{url}}">{{first}} {{last}}</a>
+            <a href="{{url}}" target="_blank">{{first}} {{last}}</a>
             {{else}}
             {{first}} {{last}}
             {{/if}}
             {{#if age}}- Age: {{age}} {{/if}}
-            {{#if city}}<a href="/signers/{{city}}">- {{city}}</a>{{/if}}</li>
+            {{#if city}}<a href="/signers/{{toLowerCase city}}">- {{city}}</a>{{/if}}</li>
     {{/rows}}
 </ul>
 

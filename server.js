@@ -60,6 +60,12 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static(`${__dirname}/public`));
 
+app.locals.helpers = {
+    toLowerCase(text) {
+        return text.toLowerCase();
+    },
+};
+
 // TODO: Update Middleware! Make Code look nice!
 
 /*************************** ROUTES ***************************/
@@ -442,6 +448,9 @@ app.get("/signers/:city", (req, res) => {
                     console.log("rows users: ", rows);
                     res.render("signers", {
                         rows,
+                        helpers: {
+                            ...app.locals.helpers,
+                        },
                         // city: false,
                         // signed: true,
                     });
