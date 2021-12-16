@@ -97,9 +97,10 @@ module.exports.getSignaturesByCity = (city) => {
     return db.query(q, params);
 };
 
+// FIXME: something is wrong here, I cant finde the issue!
+
 module.exports.getProfileUserByID = (id) => {
-    const q = `SELECT user.id, users.first, users.last, users.email, users.password, profiles.age, 
-    profiles.city, profiles.url, profiles.user_id AS profiles_user_id 
+    const q = `SELECT user.id, users.first, users.last, users.email, users.password, profiles.age, profiles.city, profiles.url, profiles.user_id 
     FROM users 
     JOIN profiles
     ON users.id = profiles.user_id
@@ -107,6 +108,13 @@ module.exports.getProfileUserByID = (id) => {
     const params = [id];
     return db.query(q, params);
 };
+
+module.exports.getUserFromUsersByID = (id) => {
+    const q = `SELECT * FROM users WHERE id = ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
 
 // get profile by id
 
@@ -118,17 +126,16 @@ module.exports.getProfileById = (id) => {
 
 // update users
 module.exports.updateUser = (firstName, lastName, email, id) => {
-    const q = `UPDATE users SET first = $1, last = $2, email = $3
-    WHERE id = $4`;
-
+    const q = `UPDATE users SET first = ($1), last = ($2), email = ($3)
+    WHERE id = ($4)`;
     const params = [firstName, lastName, email, id];
     return db.query(q, params);
 };
 
 // Update Users And Password
 module.exports.updateUserAndPW = (firstName, lastName, email, password, id) => {
-    const q = `UPDATE users SET first = $1, last = $2, email = $3, password = $4
-    WHERE id = $5`;
+    const q = `UPDATE users SET first = ($1), last = ($2), email = ($3), password = ($4)
+    WHERE id = ($5)`;
 
     const params = [firstName, lastName, email, password, id];
     return db.query(q, params);
@@ -140,7 +147,7 @@ module.exports.updateUserAndPW = (firstName, lastName, email, password, id) => {
 // DELETE
 
 module.exports.deleteSignature = (id) => {
-    const q = `DELETE FROM signatures WHERE user_id = $1`;
+    const q = `DELETE FROM signatures WHERE user_id = ($1)`;
     const params = [id];
     return db.query(q, params);
 };

@@ -2,8 +2,9 @@
 
 {{#if loggedIn}}
 {{> navbar logout=true petition=true}}
+{{!-- else if signed true --}}
 {{else}}
-{{> navbar login=true}}
+{{> navbar login=true signup=true}}
 {{/if}}
 
 {{#if error}}<div id="input-err">Please log in to sign the petition</div>{{/if}}

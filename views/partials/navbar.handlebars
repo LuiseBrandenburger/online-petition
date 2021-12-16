@@ -5,7 +5,7 @@
         <ul>
             {{#if petition}}<li><a href="/petition">SIGN PETITION</a></li>{{/if}}
             {{#if signers}}<li><a href="/signers">WHO SIGNED</a></li>{{/if}}
-            <li><a href="/">HOME</a></li>
+            {{#if home}}<li><a href="/">HOME</a></li>{{/if}}
             {{#if signup}}<li><a href="/signup">SIGN UP</a></li>{{/if}}
             {{#if edit}}<li><a href="/profile/edit">EDIT PROFILE</a></li>{{/if}}
             {{#if logout}}<li><a href="/logout">LOGOUT</a></li>{{/if}}

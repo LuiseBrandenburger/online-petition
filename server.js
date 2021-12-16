@@ -14,6 +14,7 @@ const {
     getProfileUserByID,
     getProfileById,
     updateUserAndPW,
+    getUserFromUsersByID,
     deleteSignature,
 } = require("./db");
 const { engine } = require("express-handlebars");
@@ -54,8 +55,12 @@ app.use(
         sameSite: true,
     })
 );
+
 app.use(express.urlencoded({ extended: false }));
+
 app.use(express.static(`${__dirname}/public`));
+
+// TODO: Update Middleware! Make Code look nice!
 
 /*************************** ROUTES ***************************/
 
@@ -136,13 +141,8 @@ app.post("/profile", (req, res) => {
         ) {
             signUpUserProfile(data.age, data.city, data.url, req.session.userId)
                 .then(({ rows }) => {
-                    console.log("rows in sigUpUserProfile: ", rows);
-                    req.session.userId = rows[0].id;
-                    req.session.profileId = rows[0].id;
-                    console.log(
-                        "Session Cookies after setting up user profile: ",
-                        req.session
-                    );
+                    // req.session.userId = rows[0].id;
+                    // req.session.profileId = rows[0].id;
                     res.redirect("/petition");
                 })
                 .catch((err) => {
@@ -151,10 +151,82 @@ app.post("/profile", (req, res) => {
                         error: true,
                     });
                 });
+        } else {
+            res.render("profile", {
+                wrongUrl: true,
+            });
         }
+    } else if (data.url.length === 0) {
+        signUpUserProfile(data.age, data.city, data.url, req.session.userId)
+            .then(({ rows }) => {
+                // req.session.userId = rows[0].id;
+                // req.session.profileId = rows[0].id;
+                res.redirect("/petition");
+            })
+            .catch((err) => {
+                console.log("error adding profile: ", err);
+                res.render("profile", {
+                    error: true,
+                });
+            });
     } else {
         res.redirect("/petition");
     }
+});
+
+/*************************** LOGIN ROUTE ***************************/
+
+app.get("/login", (req, res) => {
+    if (req.session.userId) {
+        if (!req.session.signatureId) {
+            res.redirect("/petition");
+        } else {
+            res.redirect("/thanks");
+        }
+    } else {
+        res.render("login", {});
+    }
+});
+
+app.post("/login", (req, res) => {
+    const data = req.body;
+    const pw = data.password;
+
+    getUserByEmail(data.email)
+        .then(({ rows }) => {
+            compare(pw, rows[0].password)
+                .then((match) => {
+                    if (match) {
+                        req.session.userId = rows[0].id;
+                        getSignatureById(req.session.userId).then(
+                            ({ rows }) => {
+                                if (rows[0].signature) {
+                                    req.session.signatureId = rows[0].id;
+                                    res.redirect("/thanks");
+                                } else {
+                                    res.redirect("/petition");
+                                }
+                            }
+                        );
+                    } else {
+                        res.render("login", {
+                            error: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log("password error", err);
+                    res.render("login", {
+                        error: true,
+                    });
+                });
+        })
+        .catch((err) => {
+            console.log("error finding user: ", err);
+            res.render("login", {
+                error: true,
+            });
+        });
 });
 
 /*************************** PROFILE EDIT HERE ***************************/
@@ -165,24 +237,41 @@ app.get("/profile/edit", (req, res) => {
     if (!req.session.userId) {
         res.redirect("/login");
     } else {
-        getProfileUserByID(req.session.userId).then(({ rows }) => {
-            // FIXME: FIXME:  WHY DOES THIS NOT WORK????? FIXME: FIXME:
-
-            console.log("ROWS for profile edit: ", rows);
-
-            res.render("edit", {
-                first: rows[0].first,
-                last: rows[0].last,
-                email: rows[0].email,
-                age: rows[0].age,
-                city: rows[0].city,
-                url: rows[0].url,
+        getUserFromUsersByID(req.session.userId)
+            .then(({ rows }) => {
+                console.log(rows);
+                res.render("edit", {
+                    first: rows[0].first,
+                    last: rows[0].last,
+                    email: rows[0].email,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
             });
-        });
-    }
 
-    res.render("edit", {});
+
+        // getProfileUserByID(req.session.userId).then(({ rows }) => {
+        //     // FIXME: FIXME:  WHY DOES THIS NOT WORK????? FIXME: FIXME:
+
+        //     console.log("ROWS for profile edit: ", rows);
+
+        //     res.render("edit", {
+        //         first: rows[0].first,
+        //         last: rows[0].last,
+        //         email: rows[0].email,
+        //         age: rows[0].age,
+        //         city: rows[0].city,
+        //         url: rows[0].url
+        //     }).catch((err)=>{
+        //         console.log("something went wrong with the query:", err);
+        //     });
+        // });
+    }
 });
+
+
+// FIXME:
 
 app.post("/profile/edit", (req, res) => {
     const data = req.body;
@@ -288,61 +377,6 @@ app.get("/thanks", (req, res) => {
     }
 });
 
-/*************************** LOGIN ROUTE ***************************/
-
-app.get("/login", (req, res) => {
-    if (req.session.userId) {
-        if (!req.session.signatureId) {
-            res.redirect("/petition");
-        } else {
-            res.redirect("/thanks");
-        }
-    } else {
-        res.render("login", {});
-    }
-});
-
-app.post("/login", (req, res) => {
-    const data = req.body;
-    const pw = data.password;
-
-    getUserByEmail(data.email)
-        .then(({ rows }) => {
-            compare(pw, rows[0].password)
-                .then((match) => {
-                    if (match) {
-                        req.session.userId = rows[0].id;
-                        getSignatureById(req.session.userId).then(
-                            ({ rows }) => {
-                                if (rows[0].signature) {
-                                    req.session.signatureId = rows[0].id;
-                                    res.redirect("/thanks");
-                                } else {
-                                    res.redirect("/petition");
-                                }
-                            }
-                        );
-                    } else {
-                        res.render("login", {
-                            error: true,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log("password error", err);
-                    res.render("login", {
-                        error: true,
-                    });
-                });
-        })
-        .catch((err) => {
-            console.log("error finding user: ", err);
-            res.render("login", {
-                error: true,
-            });
-        });
-});
-
 /*************************** SIGNERS ***************************/
 
 app.get("/signers", (req, res) => {
@@ -394,7 +428,7 @@ app.get("/signers/:city", (req, res) => {
 /*************************** LOGOUT / REDIRECT* AND OTHER ROUTES ***************************/
 
 app.post("/thanks/delete", (req, res) => {
-    console.log(req.session);
+
     deleteSignature(req.session.userId)
         .then(() => {
             req.session.signatureId = null;
@@ -404,10 +438,6 @@ app.post("/thanks/delete", (req, res) => {
             console.log(err);
             res.sendStatus(200);
         });
-});
-
-app.get("/about", (req, res) => {
-    res.render("about", {});
 });
 
 app.get("/logout", (req, res) => {
