@@ -440,6 +440,4 @@ editProfile.post("/profile/edit", (req, res) => {
     }
 });
 
-
-
 module.exports = editProfile;

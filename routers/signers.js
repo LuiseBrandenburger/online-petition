@@ -24,7 +24,6 @@ signers.get("/signers", (req, res) => {
         } else {
             getSignatures()
                 .then(({ rows }) => {
-                    console.log("rows of signatures: ", rows);
                     res.render("signers", {
                         rows,
                         signed: true,
@@ -46,7 +45,6 @@ signers.get("/signers/:city", (req, res) => {
         } else {
             getSignaturesByCity(req.params.city)
                 .then(({ rows }) => {
-                    console.log("rows users: ", rows);
                     res.render("signers", {
                         rows,
                         helpers: {
