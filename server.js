@@ -309,6 +309,239 @@ app.post("/profile/edit", (req, res) => {
             data.url.startsWith("//")
         ) {
             if (!req.body.password) {
+                if (data.first.length === 0 || data.last.length === 0) {
+                    Promise.all([
+                        getUserFromUsersByID(req.session.userId),
+                        getProfileById(req.session.userId),
+                    ])
+                        .then((results) => {
+                            if (results[1].rows[0].age === 0) {
+                                results[1].rows[0].age = "";
+                            }
+                            res.render("edit", {
+                                first: results[0].rows[0].first,
+                                last: results[0].rows[0].last,
+                                email: results[0].rows[0].email,
+                                age: results[1].rows[0].age,
+                                city: results[1].rows[0].city,
+                                url: results[1].rows[0].url,
+                                noNameInput: true,
+                            });
+                        })
+                        .catch((err) => {
+                            console.log("error aupdating Profile data: ", err);
+                            res.render("edit", {
+                                error: true,
+                            });
+                        });
+                } else {
+                    Promise.all([
+                        updateUser(
+                            data.first,
+                            data.last,
+                            data.email,
+                            req.session.userId
+                        ),
+                        upsertUserProfile(
+                            data.age,
+                            data.city,
+                            data.url,
+                            req.session.userId
+                        ),
+                    ])
+                        .then(() => {
+                            Promise.all([
+                                getUserFromUsersByID(req.session.userId),
+                                getProfileById(req.session.userId),
+                            ]).then((results) => {
+                                if (results[1].rows[0].age === 0) {
+                                    results[1].rows[0].age = "";
+                                }
+                                res.render("edit", {
+                                    first: results[0].rows[0].first,
+                                    last: results[0].rows[0].last,
+                                    email: results[0].rows[0].email,
+                                    age: results[1].rows[0].age,
+                                    city: results[1].rows[0].city,
+                                    url: results[1].rows[0].url,
+                                    updated: true,
+                                });
+                            });
+                        })
+                        .catch((err) => {
+                            console.log(
+                                "error aupdating new Profile data: ",
+                                err
+                            );
+                            res.render("edit", {
+                                error: true,
+                            });
+                        });
+                }
+            } else {
+                if (data.first.length === 0 || data.last.length === 0) {
+                    Promise.all([
+                        getUserFromUsersByID(req.session.userId),
+                        getProfileById(req.session.userId),
+                    ])
+                        .then((results) => {
+                            if (results[1].rows[0].age === 0) {
+                                results[1].rows[0].age = "";
+                            }
+                            res.render("edit", {
+                                first: results[0].rows[0].first,
+                                last: results[0].rows[0].last,
+                                email: results[0].rows[0].email,
+                                age: results[1].rows[0].age,
+                                city: results[1].rows[0].city,
+                                url: results[1].rows[0].url,
+                                noNameInput: true,
+                            });
+                        })
+                        .catch((err) => {
+                            console.log("error aupdating Profile data: ", err);
+                            res.render("edit", {
+                                error: true,
+                            });
+                        });
+                } else {
+                    hash(password)
+                        .then((hashedPw) => {
+                            Promise.all([
+                                updateUserAndPW(
+                                    data.first,
+                                    data.last,
+                                    data.email,
+                                    hashedPw,
+                                    req.session.userId
+                                ),
+                                upsertUserProfile(
+                                    data.age,
+                                    data.city,
+                                    data.url,
+                                    req.session.userId
+                                ),
+                            ])
+                                .then(() => {
+                                    Promise.all([
+                                        getUserFromUsersByID(
+                                            req.session.userId
+                                        ),
+                                        getProfileById(req.session.userId),
+                                    ]).then((results) => {
+                                        if (results[1].rows[0].age === 0) {
+                                            results[1].rows[0].age = "";
+                                        }
+                                        res.render("edit", {
+                                            first: results[0].rows[0].first,
+                                            last: results[0].rows[0].last,
+                                            email: results[0].rows[0].email,
+                                            age: results[1].rows[0].age,
+                                            city: results[1].rows[0].city,
+                                            url: results[1].rows[0].url,
+                                            updated: true,
+                                        });
+                                    });
+                                })
+                                .catch((err) => {
+                                    console.log(
+                                        "error aupdating new Profile data: ",
+                                        err
+                                    );
+                                    res.render("edit", {
+                                        error: true,
+                                    });
+                                });
+                        })
+                        .catch((err) => {
+                            console.log("err in hash", err);
+                            res.render("edit", {
+                                error: true,
+                            });
+                        });
+                }
+            }
+        } else {
+            if (data.first.length === 0 || data.last.length === 0) {
+                Promise.all([
+                    getUserFromUsersByID(req.session.userId),
+                    getProfileById(req.session.userId),
+                ])
+                    .then((results) => {
+                        if (results[1].rows[0].age === 0) {
+                            results[1].rows[0].age = "";
+                        }
+                        res.render("edit", {
+                            first: results[0].rows[0].first,
+                            last: results[0].rows[0].last,
+                            email: results[0].rows[0].email,
+                            age: results[1].rows[0].age,
+                            city: results[1].rows[0].city,
+                            url: results[1].rows[0].url,
+                            noNameInput: true,
+                        });
+                    })
+                    .catch((err) => {
+                        console.log("error aupdating Profile data: ", err);
+                        res.render("edit", {
+                            error: true,
+                        });
+                    });
+            } else {
+                Promise.all([
+                    getUserFromUsersByID(req.session.userId),
+                    getProfileById(req.session.userId),
+                ])
+                    .then((results) => {
+                        if (results[1].rows[0].age === 0) {
+                            results[1].rows[0].age = "";
+                        }
+                        res.render("edit", {
+                            first: results[0].rows[0].first,
+                            last: results[0].rows[0].last,
+                            email: results[0].rows[0].email,
+                            age: results[1].rows[0].age,
+                            city: results[1].rows[0].city,
+                            url: results[1].rows[0].url,
+                            wrongUrl: true,
+                        });
+                    })
+                    .catch((err) => {
+                        console.log("error aupdating Profile data: ", err);
+                        res.render("edit", {
+                            error: true,
+                        });
+                    });
+            }
+        }
+    } else if (data.url.length === 0) {
+        if (!req.body.password) {
+            if (data.first.length === 0 || data.last.length === 0) {
+                Promise.all([
+                    getUserFromUsersByID(req.session.userId),
+                    getProfileById(req.session.userId),
+                ])
+                    .then((results) => {
+                        if (results[1].rows[0].age === 0) {
+                            results[1].rows[0].age = "";
+                        }
+                        res.render("edit", {
+                            first: results[0].rows[0].first,
+                            last: results[0].rows[0].last,
+                            email: results[0].rows[0].email,
+                            age: results[1].rows[0].age,
+                            city: results[1].rows[0].city,
+                            url: results[1].rows[0].url,
+                            noNameInput: true,
+                        });
+                    })
+                    .catch((err) => {
+                        console.log("error aupdating Profile data: ", err);
+                        res.render("edit", {
+                            error: true,
+                        });
+                    });
+            } else {
                 Promise.all([
                     updateUser(
                         data.first,
@@ -348,9 +581,39 @@ app.post("/profile/edit", (req, res) => {
                             error: true,
                         });
                     });
+            }
+        } else {
+            if (data.first.length === 0 || data.last.length === 0) {
+                Promise.all([
+                    getUserFromUsersByID(req.session.userId),
+                    getProfileById(req.session.userId),
+                ])
+                    .then((results) => {
+                        if (results[1].rows[0].age === 0) {
+                            results[1].rows[0].age = "";
+                        }
+                        res.render("edit", {
+                            first: results[0].rows[0].first,
+                            last: results[0].rows[0].last,
+                            email: results[0].rows[0].email,
+                            age: results[1].rows[0].age,
+                            city: results[1].rows[0].city,
+                            url: results[1].rows[0].url,
+                            noNameInput: true,
+                        });
+                    })
+                    .catch((err) => {
+                        console.log("error aupdating Profile data: ", err);
+                        res.render("edit", {
+                            error: true,
+                        });
+                    });
             } else {
                 hash(password)
                     .then((hashedPw) => {
+                        if (data.age.length === 0) {
+                            data.age = 0;
+                        }
                         Promise.all([
                             updateUserAndPW(
                                 data.first,
@@ -402,129 +665,6 @@ app.post("/profile/edit", (req, res) => {
                         });
                     });
             }
-        } else {
-            Promise.all([
-                getUserFromUsersByID(req.session.userId),
-                getProfileById(req.session.userId),
-            ])
-                .then((results) => {
-                    if (results[1].rows[0].age === 0) {
-                        results[1].rows[0].age = "";
-                    }
-                    res.render("edit", {
-                        first: results[0].rows[0].first,
-                        last: results[0].rows[0].last,
-                        email: results[0].rows[0].email,
-                        age: results[1].rows[0].age,
-                        city: results[1].rows[0].city,
-                        url: results[1].rows[0].url,
-                        wrongUrl: true,
-                    });
-                })
-                .catch((err) => {
-                    console.log("error aupdating Profile data: ", err);
-                    res.render("edit", {
-                        error: true,
-                    });
-                });
-        }
-    } else if (data.url.length === 0) {
-        if (!req.body.password) {
-            Promise.all([
-                updateUser(
-                    data.first,
-                    data.last,
-                    data.email,
-                    req.session.userId
-                ),
-                upsertUserProfile(
-                    data.age,
-                    data.city,
-                    data.url,
-                    req.session.userId
-                ),
-            ])
-                .then(() => {
-                    Promise.all([
-                        getUserFromUsersByID(req.session.userId),
-                        getProfileById(req.session.userId),
-                    ]).then((results) => {
-                        if (results[1].rows[0].age === 0) {
-                            results[1].rows[0].age = "";
-                        }
-                        res.render("edit", {
-                            first: results[0].rows[0].first,
-                            last: results[0].rows[0].last,
-                            email: results[0].rows[0].email,
-                            age: results[1].rows[0].age,
-                            city: results[1].rows[0].city,
-                            url: results[1].rows[0].url,
-                            updated: true,
-                        });
-                    });
-                })
-                .catch((err) => {
-                    console.log("error aupdating new Profile data: ", err);
-                    res.render("edit", {
-                        error: true,
-                    });
-                });
-        } else {
-            hash(password)
-                .then((hashedPw) => {
-                    if (data.age.length === 0) {
-                        data.age = 0;
-                    }
-                    Promise.all([
-                        updateUserAndPW(
-                            data.first,
-                            data.last,
-                            data.email,
-                            hashedPw,
-                            req.session.userId
-                        ),
-                        upsertUserProfile(
-                            data.age,
-                            data.city,
-                            data.url,
-                            req.session.userId
-                        ),
-                    ])
-                        .then(() => {
-                            Promise.all([
-                                getUserFromUsersByID(req.session.userId),
-                                getProfileById(req.session.userId),
-                            ]).then((results) => {
-                                if (results[1].rows[0].age === 0) {
-                                    results[1].rows[0].age = "";
-                                }
-                                res.render("edit", {
-                                    first: results[0].rows[0].first,
-                                    last: results[0].rows[0].last,
-                                    email: results[0].rows[0].email,
-                                    age: results[1].rows[0].age,
-                                    city: results[1].rows[0].city,
-                                    url: results[1].rows[0].url,
-                                    updated: true,
-                                });
-                            });
-                        })
-                        .catch((err) => {
-                            console.log(
-                                "error aupdating new Profile data: ",
-                                err
-                            );
-                            res.render("edit", {
-                                error: true,
-                            });
-                        });
-                })
-                .catch((err) => {
-                    console.log("err in hash", err);
-                    res.render("edit", {
-                        error: true,
-                    });
-                });
         }
     }
 });
