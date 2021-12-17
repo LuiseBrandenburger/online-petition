@@ -121,6 +121,17 @@ input {
     text-align: center;
 }
 
+#input-update{
+    color: rgb(0, 120, 116);
+    align-self: center;
+    margin: 15px 0px 15px 10px;
+    border: 1px solid rgb(0, 120, 116);
+    width: 500px;
+    padding: 10px;
+    background-color: rgb(182, 253, 230);
+    text-align: center;
+}
+
 #delete-form {
     border: none;
     /* margin: 5px; */
