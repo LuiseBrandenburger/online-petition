@@ -25,9 +25,9 @@ profile.post("/profile", (req, res) => {
 
     if (data.url.length !== 0) {
         if (
-            data.url.startsWith("http:") ||
-            data.url.startsWith("https:") ||
-            data.url.startsWith("//")
+            data.url.toLowerCase().startsWith("http:") ||
+            data.url.toLowerCase().startsWith("https:") ||
+            data.url.toLowerCase().startsWith("//")
         ) {
             if (data.age.length === 0) {
                 data.age = 0;
@@ -47,7 +47,7 @@ profile.post("/profile", (req, res) => {
                 wrongUrl: true,
             });
         }
-    } else if (data.url.length === 0) {
+    } else if (data.url.toLowerCase().length === 0) {
         if (data.age.length === 0) {
             data.age = 0;
         }

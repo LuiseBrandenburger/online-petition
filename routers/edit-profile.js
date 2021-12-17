@@ -75,9 +75,9 @@ editProfile.post("/profile/edit", (req, res) => {
 
     if (data.url.length !== 0) {
         if (
-            data.url.startsWith("http:") ||
-            data.url.startsWith("https:") ||
-            data.url.startsWith("//")
+            data.url.toLowerCase().startsWith("http:") ||
+            data.url.toLowerCase().startsWith("https:") ||
+            data.url.toLowerCase().startsWith("//")
         ) {
             if (!req.body.password) {
                 if (data.first.length === 0 || data.last.length === 0) {
