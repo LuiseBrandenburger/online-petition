@@ -1,11 +1,7 @@
 const express = require("express");
 const app = express();
 const signers = express.Router();
-const {
-    getSignatures,
-    getSignaturesByCity,
-} = require("../db");
-
+const { getSignatures, getSignaturesByCity } = require("../db");
 
 app.locals.helpers = {
     toLowerCase(text) {
@@ -27,6 +23,7 @@ signers.get("/signers", (req, res) => {
                     res.render("signers", {
                         rows,
                         signed: true,
+                        // url: true,
                     });
                 })
                 .catch((err) => {
@@ -58,6 +55,5 @@ signers.get("/signers/:city", (req, res) => {
         }
     }
 });
-
 
 module.exports = signers;

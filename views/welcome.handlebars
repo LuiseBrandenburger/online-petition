@@ -1,8 +1,12 @@
 {{!-- TODO: Update Handlebar: wenn User Logged in ist --}}
 
 {{#if loggedIn}}
-{{> navbar logout=true petition=true}}
+{{> navbar logout=true petition=true edit=true}}
 {{!-- else if signed true --}}
+
+{{else if loggedInAndSignedPetition}}
+{{> navbar logout=true edit=true signers=true}}
+
 {{else}}
 {{> navbar login=true signup=true}}
 {{/if}}

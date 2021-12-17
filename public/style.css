@@ -145,15 +145,18 @@ img {
     border: 1px solid grey;
 }
 
-
-
-ul {
+nav ul {
     display: flex;
+    flex-direction: row;
 }
 
 li {
     list-style: none;
     margin-right: 15px;
+}
+
+#signers-list-link {
+    display: inline;
 }
 
 a {

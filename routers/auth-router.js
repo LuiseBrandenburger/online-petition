@@ -1,23 +1,23 @@
 const express = require("express");
 const authRouter = express.Router();
-const {
-    signUpUser,
-    getUserByEmail,
-    getSignatureById,
-
-} = require("../db");
+const { signUpUser, getUserByEmail, getSignatureById } = require("../db");
 const { compare, hash } = require("../bc");
-
 
 /*************************** ROUTES ***************************/
 
 authRouter.get("/", (req, res) => {
     if (req.session.userId) {
-        res.render("welcome", {
-            loggedIn: true,
-        });
+        if (!req.session.signatureId) {
+            res.render("welcome", {
+                loggedIn: true,
+            });
+        } else {
+            res.render("welcome", {
+                loggedInAndSignedPetition: true,
+            });
+        }
     } else {
-        res.render("welcome", {});
+        res.render("login", {});
     }
 });
 
@@ -63,7 +63,6 @@ authRouter.post("/signup", (req, res) => {
     }
 });
 
-
 /*************************** LOGIN ROUTE ***************************/
 
 authRouter.get("/login", (req, res) => {
@@ -71,7 +70,7 @@ authRouter.get("/login", (req, res) => {
         if (!req.session.signatureId) {
             res.redirect("/petition");
         } else {
-            res.redirect("/thanks");
+            res.redirect("/thanks", {});
         }
     } else {
         res.render("login", {});
@@ -123,6 +122,5 @@ authRouter.get("/logout", (req, res) => {
     req.session = null;
     res.render("logout", {});
 });
-
 
 module.exports = authRouter;

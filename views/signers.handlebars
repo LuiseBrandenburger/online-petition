@@ -1,12 +1,22 @@
+
 {{> navbar logout=true edit=true signers=true home=true}}
+
 
 <div class="main-container">
 <ul>
     {{#rows}}
-        <li>{{#if url}}
+        <li>
+            {{#if url}}
             <a href="{{url}}" target="_blank">{{first}} {{last}}</a>
-            {{else}}{{first}} {{last}}{{/if}}{{#if age}}- Age: {{age}} {{/if}}
-            {{#if city}}<a href="/signers/{{toLowerCase city}}">- {{city}}</a>{{/if}}</li>
+            {{else}}
+            {{first}} {{last}}
+            {{/if}}
+            
+            {{#if age}} - Age: {{age}} {{/if}}
+
+            {{#if city}}<a id="signers-list-link" href="/signers/{{toLowerCase city}}">- {{city}}</a> {{/if}}
+
+        </li>
     {{/rows}}
 </ul>
 
