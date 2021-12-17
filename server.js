@@ -47,6 +47,12 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static(`${__dirname}/public`));
 
+app.locals.helpers = {
+    toLowerCase(text) {
+        return text.toLowerCase();
+    },
+};
+
 /*************************** ROUTES ***************************/
 
 app.use(authRouter);
