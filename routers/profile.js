@@ -1,24 +1,8 @@
 const express = require("express");
 const profile = express.Router();
 const {
-    // addUser,
-    // getUserByID,
-    // numTotalUser,
-    // signUpUser,
-    // getUserByEmail,
-    // getSignatureById,
     signUpUserProfile,
-    // getSignatures,
-    // getSignaturesByCity,
-    // getProfileUserByID,
-    // getProfileById,
-    // updateUser,
-    // updateUserAndPW,
-    // deleteSignature,
-    // getUserFromUsersByID,
-    // upsertUserProfile,
 } = require("../db");
-// const { compare, hash } = require("../bc");
 
 
 /*************************** PROFILE ROUTE ***************************/

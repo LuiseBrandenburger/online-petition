@@ -10,12 +10,6 @@ const {
 } = require("../db");
 const { hash } = require("../bc");
 
-// writing routes on sup router (like a small server)
-// mini express application
-// editProfile.get();
-
-// editProfile.post();
-
 /*************************** PROFILE EDIT HERE ***************************/
 
 editProfile.get("/profile/edit", (req, res) => {
