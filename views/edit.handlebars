@@ -3,6 +3,8 @@
 
 {{#if error}}<div id="input-err">something went wrong with edit, please try again</div>{{/if}}
 {{#if updated}}<div id="input-err">Form was successfully updated</div>{{/if}}
+{{#if wrongUrl}}<div id="input-err">Wrong URL Input, URL has to start with: http:, https: or //</div>{{/if}}
+
 
 <form action="" method="POST" id="edit-form">
 <label for="edit-first">First Name</label>
