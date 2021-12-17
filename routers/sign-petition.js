@@ -4,6 +4,7 @@ const {
     addUser,
     getUserByID,
     numTotalUser,
+    deleteSignature,
 } = require("../db");
 
 
@@ -57,6 +58,18 @@ signPetition.get("/thanks", (req, res) => {
     } else {
         res.redirect("/petition");
     }
+});
+
+signPetition.post("/thanks/delete", (req, res) => {
+    deleteSignature(req.session.userId)
+        .then(() => {
+            req.session.signatureId = null;
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log(err);
+            res.sendStatus(200);
+        });
 });
 
 module.exports = signPetition;

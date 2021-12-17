@@ -18,11 +18,11 @@ const {
     getUserFromUsersByID,
     upsertUserProfile,
 } = require("./db");
+const { compare, hash } = require("./bc");
 const { engine } = require("express-handlebars");
 const cookieSession = require("cookie-session");
 let secret =
     process.env.COOKIE_SECRET || require("./secrets.json").COOKIE_SECRET;
-const { compare, hash } = require("./bc");
 
 /*************************** REQUIRE ROUTERS ***************************/
 
@@ -84,115 +84,115 @@ app.use(profile);
 app.use(editProfile);
 
 
-/*************************** ROUTES ***************************/
+// /*************************** ROUTES ***************************/
 
-app.get("/", (req, res) => {
-    if (req.session.userId) {
-        res.render("welcome", {
-            loggedIn: true,
-        });
-    } else {
-        res.render("welcome", {});
-    }
-});
+// app.get("/", (req, res) => {
+//     if (req.session.userId) {
+//         res.render("welcome", {
+//             loggedIn: true,
+//         });
+//     } else {
+//         res.render("welcome", {});
+//     }
+// });
 
-/*************************** REGISTRATION ROUTE ***************************/
+// /*************************** REGISTRATION ROUTE ***************************/
 
-app.get("/signup", (req, res) => {
-    if (req.session.userId) {
-        res.redirect("/petition");
-    } else {
-        res.render("signup", {});
-    }
-});
+// app.get("/signup", (req, res) => {
+//     if (req.session.userId) {
+//         res.redirect("/petition");
+//     } else {
+//         res.render("signup", {});
+//     }
+// });
 
-app.post("/signup", (req, res) => {
-    const data = req.body;
-    const pw = data.password;
+// app.post("/signup", (req, res) => {
+//     const data = req.body;
+//     const pw = data.password;
 
-    if (data.first == "" || data.last == "" || data.email == "" || pw == "") {
-        res.render("signup", {
-            error: true,
-        });
-    } else {
-        hash(pw)
-            .then((hashedPw) => {
-                signUpUser(data.first, data.last, data.email, hashedPw)
-                    .then(({ rows }) => {
-                        req.session.userId = rows[0].id;
-                        res.redirect("/profile");
-                    })
-                    .catch((err) => {
-                        console.log("error adding user: ", err);
-                        res.render("signup", {
-                            error: true,
-                        });
-                    });
-            })
-            .catch((err) => {
-                console.log("err in hash", err);
-                res.render("signup", {
-                    error: true,
-                });
-            });
-    }
-});
+//     if (data.first == "" || data.last == "" || data.email == "" || pw == "") {
+//         res.render("signup", {
+//             error: true,
+//         });
+//     } else {
+//         hash(pw)
+//             .then((hashedPw) => {
+//                 signUpUser(data.first, data.last, data.email, hashedPw)
+//                     .then(({ rows }) => {
+//                         req.session.userId = rows[0].id;
+//                         res.redirect("/profile");
+//                     })
+//                     .catch((err) => {
+//                         console.log("error adding user: ", err);
+//                         res.render("signup", {
+//                             error: true,
+//                         });
+//                     });
+//             })
+//             .catch((err) => {
+//                 console.log("err in hash", err);
+//                 res.render("signup", {
+//                     error: true,
+//                 });
+//             });
+//     }
+// });
 
 
-/*************************** LOGIN ROUTE ***************************/
+// /*************************** LOGIN ROUTE ***************************/
 
-app.get("/login", (req, res) => {
-    if (req.session.userId) {
-        if (!req.session.signatureId) {
-            res.redirect("/petition");
-        } else {
-            res.redirect("/thanks");
-        }
-    } else {
-        res.render("login", {});
-    }
-});
+// app.get("/login", (req, res) => {
+//     if (req.session.userId) {
+//         if (!req.session.signatureId) {
+//             res.redirect("/petition");
+//         } else {
+//             res.redirect("/thanks");
+//         }
+//     } else {
+//         res.render("login", {});
+//     }
+// });
 
-app.post("/login", (req, res) => {
-    const data = req.body;
-    const pw = data.password;
+// app.post("/login", (req, res) => {
+//     const data = req.body;
+//     const pw = data.password;
 
-    getUserByEmail(data.email)
-        .then(({ rows }) => {
-            compare(pw, rows[0].password)
-                .then((match) => {
-                    if (match) {
-                        req.session.userId = rows[0].id;
-                        getSignatureById(req.session.userId).then(
-                            ({ rows }) => {
-                                if (rows[0].signature) {
-                                    req.session.signatureId = rows[0].id;
-                                    res.redirect("/thanks");
-                                } else {
-                                    res.redirect("/petition");
-                                }
-                            }
-                        );
-                    } else {
-                        res.render("login", {
-                            error: true,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log("password error", err);
-                    res.render("login", {
-                        error: true,
-                    });
-                });
-        })
-        .catch((err) => {
-            console.log("error finding user: ", err);
-            res.render("login", {
-                error: true,
-            });
-        });
-});
+//     getUserByEmail(data.email)
+//         .then(({ rows }) => {
+//             compare(pw, rows[0].password)
+//                 .then((match) => {
+//                     if (match) {
+//                         req.session.userId = rows[0].id;
+//                         getSignatureById(req.session.userId).then(
+//                             ({ rows }) => {
+//                                 if (rows[0].signature) {
+//                                     req.session.signatureId = rows[0].id;
+//                                     res.redirect("/thanks");
+//                                 } else {
+//                                     res.redirect("/petition");
+//                                 }
+//                             }
+//                         );
+//                     } else {
+//                         res.render("login", {
+//                             error: true,
+//                         });
+//                     }
+//                 })
+//                 .catch((err) => {
+//                     console.log("password error", err);
+//                     res.render("login", {
+//                         error: true,
+//                     });
+//                 });
+//         })
+//         .catch((err) => {
+//             console.log("error finding user: ", err);
+//             res.render("login", {
+//                 error: true,
+//             });
+//         });
+// });
 
 
 // /*************************** SIGN PETITION ***************************/
@@ -299,22 +299,22 @@ app.get("/signers/:city", (req, res) => {
 
 /*************************** LOGOUT / REDIRECT* AND OTHER ROUTES ***************************/
 
-app.post("/thanks/delete", (req, res) => {
-    deleteSignature(req.session.userId)
-        .then(() => {
-            req.session.signatureId = null;
-            res.redirect("/petition");
-        })
-        .catch((err) => {
-            console.log(err);
-            res.sendStatus(200);
-        });
-});
+// app.post("/thanks/delete", (req, res) => {
+//     deleteSignature(req.session.userId)
+//         .then(() => {
+//             req.session.signatureId = null;
+//             res.redirect("/petition");
+//         })
+//         .catch((err) => {
+//             console.log(err);
+//             res.sendStatus(200);
+//         });
+// });
 
-app.get("/logout", (req, res) => {
-    req.session = null;
-    res.render("logout", {});
-});
+// app.get("/logout", (req, res) => {
+//     req.session = null;
+//     res.render("logout", {});
+// });
 
 app.get("*", (req, res) => {
     res.redirect("/");
