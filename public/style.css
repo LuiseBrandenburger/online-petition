@@ -21,14 +21,34 @@ body {
     overflow: hidden;
     /* align-items: center; */
 }
+h1 {
+    margin: 10px;
+}
 
-#welcome-container {
+/* #welcome-container {
     flex-grow: 1;
     padding: 30px;
+} */
+/*********  MAIN CONTAINER  ********/
+
+.main-container {
+    flex-grow: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#thanks-container, #petition-container {
+    align-items: center;
 }
 
 canvas {
     background-color: #fff;
+}
+
+#signature-img {
+    margin: 20px;
 }
 
 /*********  NAVBAR  ********/
@@ -86,9 +106,9 @@ input {
     padding: 5px;
 }
 
-#edit-email:focus {
+/* input:focus-within {
     border: 1px solid rgb(120, 0, 0);
-}
+} */
 
 #input-err {
     color: rgb(120, 0, 0);
@@ -103,6 +123,7 @@ input {
 
 #delete-form {
     border: none;
+    /* margin: 5px; */
 }
 
 #try-again {

@@ -1,5 +1,6 @@
 {{> navbar petition=true home=true edit=true}}
 
+<div class="main-container">
 {{#if error}}<div id="input-err">something went wrong with the registration, please try again</div>{{/if}}
 {{#if wrongUrl}}<div id="input-err">Wrong URL Input, URL has to start with: http:, https: or //</div>{{/if}}
 
@@ -13,3 +14,4 @@
 <input type="text" id="profile-url" name="url" placeholder="URL STARTING WITH HTTPS: HTTP: or //">
 <button id="signup-btn">continue</button>
 </form>
+</div>

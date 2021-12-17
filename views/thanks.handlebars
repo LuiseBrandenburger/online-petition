@@ -1,9 +1,11 @@
 {{> navbar logout=true edit=true signers=true home=true}}
 
+<div class="main-container" id="thanks-container">
 <img id="signature-img" src="{{signatureURL}}" alt="picture of a signature">
 
-<h1>THANK YOU!!! {{count}} People signed the petition so far</h1>
+<h1>Thank you for signing the petition. Current count of signatures: {{count}}</h1>
 
 <form action="/thanks/delete" method="POST" id="delete-form">
     <button id="delete-signature">DELETE SIGNATURE</button>
 </form>
+</div>

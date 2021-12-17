@@ -1,6 +1,7 @@
 
 {{> navbar logout=true edit=true signers=true home=true}}
 
+<div class="main-container">
 {{#if error}}<div id="input-err">something went wrong with edit, please try again</div>{{/if}}
 {{#if updated}}<div id="input-err">Form was successfully updated</div>{{/if}}
 {{#if wrongUrl}}<div id="input-err">Wrong URL Input, URL has to start with: http:, https: or //</div>{{/if}}
@@ -24,7 +25,8 @@
 <button id="edit-btn">UPDATE PROFILE</button>
 </form>
 
-
-<form action="/thanks/delete" method="POST">
+{{!-- <form action="/thanks/delete" method="POST" id="delete-form">
     <button id="delete-signature">DELETE SIGNATURE</button>
-</form>
+</form> --}}
+
+</div>

@@ -294,7 +294,6 @@ app.get("/profile/edit", (req, res) => {
     }
 });
 
-// FIXME:
 app.post("/profile/edit", (req, res) => {
     const data = req.body;
     const password = data.password;

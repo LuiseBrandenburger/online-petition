@@ -1,6 +1,6 @@
 {{> navbar logout=true edit=true home=true}}
 {{! Zeigt das Formular }}
-
+<div class="main-container" id="petition-container">
 <h1>You are on the PETITION PAGE</h1>
 
 {{#if error}}<div id="input-err">this went wrong</div>{{/if}}
@@ -22,5 +22,7 @@
     <button id="submit-btn">Submit</button>
 </form>
 
+</div>
 
 <script src="petitionScript.js"></script>
+
