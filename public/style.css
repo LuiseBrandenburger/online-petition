@@ -9,7 +9,7 @@
     /* --main-font: "Roboto", sans-serif; */
     --main-font: "Roboto Mono", monospace;
     --bgc-color: #141414;
-    --text-color: #F0EFF4;
+    --text-color: #f0eff4;
 }
 
 body {
@@ -21,7 +21,6 @@ body {
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
-    /* align-items: center; */
 }
 
 h1 {
@@ -33,11 +32,6 @@ h1 {
     width: auto;
 }
 
-
-/* #welcome-container {
-    flex-grow: 1;
-    padding: 30px;
-} */
 /*********  MAIN CONTAINER  ********/
 
 .main-container {
@@ -51,14 +45,12 @@ h1 {
     color: rgb(70, 204, 191);
 }
 
-/* #welcome-container, #logged-out-container, #signup-container {
-} */
-
 #text-container {
     width: 50%;
 }
 
-#thanks-container, #petition-container {
+#thanks-container,
+#petition-container {
     align-items: center;
 }
 
@@ -116,7 +108,6 @@ form {
     border: none;
 }
 
-
 form button {
     margin-top: 20px;
     width: 150px;
@@ -141,7 +132,7 @@ input {
     text-align: center;
 }
 
-#input-update{
+#input-update {
     color: rgb(0, 120, 116);
     align-self: center;
     margin: 15px 0px 15px 10px;
@@ -159,7 +150,6 @@ input {
 #try-again:hover {
     color: rgb(5, 29, 26);
 }
-
 
 /*********  OTHERS ********/
 
@@ -199,4 +189,34 @@ nav a {
 footer {
     font-size: 0.8rem;
     margin: 10px 10px;
+}
+
+/* ---------------------------- Media Queries -----------------------------------*/
+
+@media screen and (max-width: 375px) {
+    /*********  MAIN CONTAINER  ********/
+
+    #text-container {
+        width: 100%;
+    }
+
+    form {
+        width: 100%;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    #input-err {
+        width: 100%;
+        font-size: 0.75rem;
+    }
+
+    #input-update {
+        width: 100%;
+        font-size: 0.75rem;
+    }
+
+
 }
