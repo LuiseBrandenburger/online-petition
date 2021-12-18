@@ -26,10 +26,6 @@ signPetition.get("/petition", (req, res) => {
 signPetition.post("/petition", (req, res) => {
     if (!req.session.signatureId) {
         const data = req.body;
-
-        console.log("data signature:", data.signature);
-        console.log("data signature length: ", data.signature.legth);
-
         if (data.signature === "") {
             res.render("petition", {
                 error: true,

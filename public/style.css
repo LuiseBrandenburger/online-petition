@@ -25,7 +25,7 @@ body {
 }
 
 h1 {
-    margin: 10px;
+    margin-bottom: 10px;
 }
 
 #img-welcome {
@@ -46,6 +46,16 @@ h1 {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background-image: url(img/band2.JPG);
+    background-position: left center;
+    color: rgb(70, 204, 191);
+}
+
+/* #welcome-container, #logged-out-container, #signup-container {
+} */
+
+#text-container {
+    width: 50%;
 }
 
 #thanks-container, #petition-container {
@@ -96,13 +106,16 @@ form {
     align-items: center;
     width: 400px;
     padding: 30px;
-    border: 2px solid grey;
     align-self: center;
+    background-color: var(--bgc-color);
+    width: 30%;
 }
 
-#petition-form {
-    width: 500px;
+#delete-form {
+    background-color: transparent;
+    border: none;
 }
+
 
 form button {
     margin-top: 20px;
@@ -110,19 +123,12 @@ form button {
     height: 40px;
     font-family: var(--main-font);
 }
+
 input {
     width: 350px;
     font-family: var(--main-font);
     padding: 5px;
 }
-
-#edit-form {
-    background-color: #1a2724;
-}
-
-/* input:focus-within {
-    border: 1px solid rgb(120, 0, 0);
-} */
 
 #input-err {
     color: rgb(120, 0, 0);
@@ -144,11 +150,6 @@ input {
     padding: 10px;
     background-color: rgb(182, 253, 230);
     text-align: center;
-}
-
-#delete-form {
-    border: none;
-    /* margin: 5px; */
 }
 
 #try-again {
@@ -187,10 +188,13 @@ li {
 a {
     text-decoration: none;
     display: flex;
-    /* color: rgb(20, 20, 20); */
     color: rgb(70, 204, 191);
+    text-decoration: underline;
 }
 
+nav a {
+    text-decoration: none;
+}
 
 footer {
     font-size: 0.8rem;

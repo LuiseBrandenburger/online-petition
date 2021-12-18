@@ -3,18 +3,16 @@
 
 
 <div class="main-container">
-<ul>
+<ul id="signers-list">
     {{#rows}}
         <li>
             {{#if url}}
-            <a href="{{url}}" target="_blank">{{first}} {{last}}</a>
+            <a href="{{url}}" id="signers-list-link" target="_blank">{{first}} {{last}}</a>
             {{else}}
             {{first}} {{last}}
             {{/if}}
             
-            {{#if age}} - Age: {{age}} {{/if}}
-
-            {{#if city}}<a id="signers-list-link" href="/signers/{{toLowerCase city}}">- {{city}}</a> {{/if}}
+            {{#if age}} - Age: {{age}}{{/if}}{{#if city}}<span>, from </span> <a id="signers-list-link" href="/signers/{{toLowerCase city}}">{{city}}</a> {{/if}}
 
         </li>
     {{/rows}}
