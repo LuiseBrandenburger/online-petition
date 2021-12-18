@@ -9,7 +9,6 @@
     let x = 0;
     let y = 0;
 
-    // FIXME: Aufräumen!!! 
     signatureCan.addEventListener("mousedown", (event) => {
         x = event.offsetX;
         y = event.offsetY;
@@ -31,19 +30,13 @@
             x = 0;
             y = 0;
         }
+        signatureInput.value = signatureCan.toDataURL();
         isDrawing = false;
     });
 
     trySigAgain.addEventListener("click", () => {
         // console.log("try it again");
         context.clearRect(0, 0, signatureCan.width, signatureCan.height);
-    });
-
-    // FIXME: das signature Feld darf nicht leer sein!
-
-    submitBtn.addEventListener("click", () => {
-        signatureInput.value = signatureCan.toDataURL();
-        // console.log("signature Input Value: ", signatureInput.value);
     });
 
     function drawSignature(context, startX, startY, moveX, moveY) {

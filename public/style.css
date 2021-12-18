@@ -23,9 +23,16 @@ body {
     overflow: hidden;
     /* align-items: center; */
 }
+
 h1 {
     margin: 10px;
 }
+
+#img-welcome {
+    height: auto;
+    width: auto;
+}
+
 
 /* #welcome-container {
     flex-grow: 1;

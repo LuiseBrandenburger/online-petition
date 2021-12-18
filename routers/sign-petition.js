@@ -7,7 +7,6 @@ const {
     deleteSignature,
 } = require("../db");
 
-
 /*************************** SIGN PETITION ***************************/
 
 signPetition.get("/petition", (req, res) => {
@@ -27,17 +26,28 @@ signPetition.get("/petition", (req, res) => {
 signPetition.post("/petition", (req, res) => {
     if (!req.session.signatureId) {
         const data = req.body;
-        addUser(data.signature, req.session.userId)
-            .then(({ rows }) => {
-                req.session.signatureId = rows[0].id;
-                res.redirect("/thanks");
-            })
-            .catch((err) => {
-                console.log("error adding user: ", err);
-                res.render("petition", {
-                    error: true,
-                });
+
+        console.log("data signature:", data.signature);
+        console.log("data signature length: ", data.signature.legth);
+
+        if (data.signature === "") {
+            res.render("petition", {
+                error: true,
+                noSignature: true,
             });
+        } else {
+            addUser(data.signature, req.session.userId)
+                .then(({ rows }) => {
+                    req.session.signatureId = rows[0].id;
+                    res.redirect("/thanks");
+                })
+                .catch((err) => {
+                    console.log("error adding user: ", err);
+                    res.render("petition", {
+                        error: true,
+                    });
+                });
+        }
     } else {
         res.redirect("/thanks");
     }
