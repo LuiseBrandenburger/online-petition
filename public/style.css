@@ -63,13 +63,17 @@ canvas {
     background-color: var(--text-color);
 }
 
+#text-container a {
+    display: inline;
+}
+
 /*********  NAVBAR  ********/
 
 nav {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    height: 70px;
+    height: 10%;
     background-color: var(--bgc-color);
 }
 

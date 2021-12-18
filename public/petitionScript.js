@@ -4,6 +4,8 @@
     const submitBtn = document.getElementById("submit-btn");
     const signatureInput = document.getElementById("signature");
 
+    console.log("navigator touch points: ",navigator.maxTouchPoints);
+
     let context = signatureCan.getContext("2d");
     let isDrawing = false;
     let x = 0;

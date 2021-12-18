@@ -4,6 +4,7 @@
 <h1 id="text-container">Please help musicians around the world and sign this petition.</h1>
 
 {{#if error}}<div id="input-err">Something went wrong</div>{{/if}}
+{{#if noTouchPoints}}<div id="input-err">App can not be signed from a mobile device</div>{{/if}}
 
 <form action="" method="POST" id="petition-form">
     <label for="signature">PLEASE SIGN HERE:</label>
