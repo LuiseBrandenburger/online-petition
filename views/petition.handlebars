@@ -1,15 +1,11 @@
 {{> navbar logout=true edit=true home=true}}
 {{! Zeigt das Formular }}
 <div class="main-container" id="petition-container">
-<h1>You are on the PETITION PAGE</h1>
+<h1>Please help musicians around the world and sign this petition.</h1>
 
-{{#if error}}<div id="input-err">this went wrong</div>{{/if}}
+{{#if error}}<div id="input-err">Something went wrong</div>{{/if}}
 
 <form action="" method="POST" id="petition-form">
-    {{!-- <label for="fist">First Name</label>
-    <input type="text" id="first" name="first" />
-    <label for="last">Last Name</label>
-    <input type="text" id="last" name="last" /> --}}
     <label for="signature">PLEASE SIGN HERE:</label>
     <input type="hidden" id="signature" name="signature" />
     <canvas
@@ -17,9 +13,9 @@
         height="100"
         width="400"
     ></canvas>
-    <div id="try-again">try it again</div>
+    <div id="try-again">TRY IT AGAIN</div>
     <!-- <input type="hidden" id="signature"> -->
-    <button id="submit-btn">Submit</button>
+    <button id="submit-btn">SUBMIT</button>
 </form>
 
 </div>
