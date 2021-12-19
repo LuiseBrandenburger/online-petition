@@ -110,6 +110,8 @@ form {
 #delete-form {
     background-color: transparent;
     border: none;
+    padding: 0;
+    margin: 0;
 }
 
 form button {
@@ -193,6 +195,7 @@ nav a {
 footer {
     font-size: 0.8rem;
     margin: 10px 10px;
+    color: grey;
 }
 
 /* ---------------------------- Media Queries -----------------------------------*/

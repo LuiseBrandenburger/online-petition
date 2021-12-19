@@ -14,23 +14,11 @@ signPetition.get("/petition", (req, res) => {
         if (req.session.signatureId) {
             res.redirect("/thanks");
         } else {
-
-            // console.log(navigator.maxTouchPoints);
-
-            // if (navigator.maxTouchPoints > 1) {
-            //     res.render("petition", {});
-            // } else {
-            //     res.render("petition", {
-            //         noTouchPoints: true,
-            //     });
-            // }
-
             res.render("petition", {});
-
         }
     } else {
-        res.render("welcome", {
-            error: true,
+        res.render("signup", {
+            loggedOut: true,
         });
     }
 });

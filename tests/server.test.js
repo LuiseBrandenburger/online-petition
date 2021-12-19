@@ -25,3 +25,6 @@ redirected to the petition page when they attempt to go to either
 the thank you page or the signers page
  */
 
+test("Check redirection to registration when logged out at petitionpage", () => {
+    cookieSession.mockSessinOnce({ userId: 1, signatureId: 7 });
+});

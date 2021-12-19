@@ -5,6 +5,7 @@
 <div class="main-container" id="signup-container">
 
 {{#if error}}<div id="input-err">Something went wrong with the registration, please try it again</div>{{/if}}
+{{#if loggedOut}}<div id="input-err">Please register to sign the petition</div>{{/if}}
 
 <form action="" method="POST" id="signup-form">
 <label for="signup-first">First Name</label>

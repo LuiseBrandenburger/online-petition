@@ -67,11 +67,7 @@ authRouter.post("/signup", (req, res) => {
 
 authRouter.get("/login", (req, res) => {
     if (req.session.userId) {
-        if (!req.session.signatureId) {
-            res.redirect("/petition");
-        } else {
-            res.redirect("/thanks", {});
-        }
+        res.redirect("/petition");
     } else {
         res.render("login", {});
     }
