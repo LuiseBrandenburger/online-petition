@@ -17,6 +17,7 @@ I created this project to learn how to build a frontend and connect it with a ba
 This Project was built with JS, Handlebars.js, Node.js/Express and PostgreSQL.
 Other Libraries I used:
 - cookie session
+- bcrypt
 
 ## Features
 - Users can create a profile or login/logout into their account
