@@ -9,25 +9,14 @@ So far, the project consists of some very basic features. With this app you can 
 (preferably of the great artist Roger Dean) and comment on existing images.
 
 ## Motivation
-I created this project to get to know Vue.js and getting to know state and data flow in a full stack project.
+I created this project to learn how to build a frontend and connect it with a backend and eventually deploy it on Heroku.
 
 ## Tech
-This Project was built with Vue.js, Node.js/Express and PostgreSQL.
+This Project was built with Vanilla JS, Handlebars, Node.js/Express and PostgreSQL.
 Other Libraries I used:
 - cookie session
-- moment
-- aws, s3
 
 ## Features
-- Users can upload files (images)
-- Users can add title, description when posting the image
-- moments is used to render the timestamp to the comments and image post
-- Users can view and add comment on single images
-
-## Future Features
-Features I would like to add in the future are:
-- infinite scroll
-- delete images
-
-## TO DO'S
-- testing
+- Users can create a profile or login/logout into their account
+- Users can sign or delet their signature from the petition
+- users can add aditional information such as age, city
