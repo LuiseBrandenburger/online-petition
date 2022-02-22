@@ -7,8 +7,7 @@ https://petition-luise.herokuapp.com/
 
 ## Overview
 This project was built as my first full stack project during my enrollment at the Spiced Academy Bootcamp. 
-So far, the project consists of some very basic features. With this app you can upload images 
-(preferably of the great artist Roger Dean) and comment on existing images.
+So far, the project consists of some very basic features.
 
 ## Motivation
 I created this project to learn how to build a frontend and connect it with a backend and eventually deploy it on Heroku.
