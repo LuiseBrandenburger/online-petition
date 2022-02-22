@@ -14,7 +14,7 @@ So far, the project consists of some very basic features. With this app you can 
 I created this project to learn how to build a frontend and connect it with a backend and eventually deploy it on Heroku.
 
 ## Tech
-This Project was built with Vanilla JS, Handlebars, Node.js/Express and PostgreSQL.
+This Project was built with JS, Handlebars.js, Node.js/Express and PostgreSQL.
 Other Libraries I used:
 - cookie session
 
