@@ -19,4 +19,4 @@ Other Libraries I used:
 ## Features
 - Users can create a profile or login/logout into their account
 - Users can sign or delet their signature from the petition
-- users can add aditional information such as age, city
+- users can add aditional information such as age, city or homepage
