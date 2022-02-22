@@ -1,5 +1,5 @@
 # Online Petition
-A platform where users can creat an account or login and sign a petition.
+An online petition built with Handlebars.js where supporters can register/login/logout, add/update profile information, sign the petition, redo the petition and view a list of fellow signers sorted by location.
 
 ![gfy-landingpage](https://github.com/LuiseBrandenburger/portfolio-next/blob/main/public/content/petition.JPG)
 
@@ -19,4 +19,5 @@ Other Libraries I used:
 ## Features
 - Users can create a profile or login/logout into their account
 - Users can sign or delet their signature from the petition
-- users can add aditional information such as age, city or homepage
+- Users can add aditional information such as age, city or homepage
+- Users can view a list of all signers as soon as they signed the petition
