@@ -9,9 +9,6 @@ https://petition-luise.herokuapp.com/
 This project was built as my first full stack project during my enrollment at the Spiced Academy Bootcamp. 
 So far, the project consists of some very basic features.
 
-## Motivation
-I created this project to learn how to build a frontend and connect it with a backend and eventually deploy it on Heroku.
-
 ## Tech
 This Project was built with JS, Handlebars.js, Node.js/Express and PostgreSQL.
 Other Libraries I used:
